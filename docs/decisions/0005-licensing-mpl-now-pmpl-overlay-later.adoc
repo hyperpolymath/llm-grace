@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
+= ADR-0005: Licensing posture (MPL-2.0 now; PMPL overlay later) + licensing debt
+:status: ACCEPTED (with recorded debt)
+
+== Status
+
+*ACCEPTED.* Operative licence is MPL-2.0. Two items of licensing debt
+recorded and tracked.
+
+== Context
+
+Scaffolded from `rsr-template-repo`, whose default SPDX is
+`PMPL-1.0-or-later` (Palimpsest). Estate licensing rule (owner
+Jonathan Jewell):
+
+* Default: anything the owner owns is *MPL-2.0* unless expressly stated.
+* `007` is excluded (expressly-stated separate licence).
+* Anything the owner's son owns, or is repo-admin for, is
+  *AGPL-3.0-or-later*.
+
+`llm-grace` is owner-owned, not `007`, not son-owned -> *MPL-2.0*.
+
+PMPL is *not* legally effective standalone: until the governing
+council and an established legal code exist, a bare PMPL claim has no
+force and falls immediately. PMPL is only ever a *future overlay on
+top of* MPL-2.0 — never a replacement, never a present standalone
+claim.
+
+== Decision
+
+. Operative licence: *MPL-2.0*. `LICENSE` holds canonical MPL-2.0 text.
+. New project files carry `SPDX-License-Identifier: MPL-2.0`.
+. No standalone PMPL claim anywhere.
+
+== Licensing debt (recorded, tracked)
+
+* *Debt 1 — relicense sweep*: ~199 template files still carry
+  `PMPL-1.0-or-later`. Replace with `MPL-2.0`; complete the RSR
+  `just init` placeholder bootstrap in the same pass. Tracked as a
+  build sub-issue (deliberately not half-applied — foundation-first).
+* *Debt 2 — PMPL overlay migration*: when the council + established
+  legal code exist, deliberately move to "MPL-2.0 with PMPL overlay".
+  Gated on that external precondition; tracked, not actioned now.
+
+== Consequences
+
+Honest, legally-real licence today; aspirational PMPL future is
+documented as debt, not silently asserted.

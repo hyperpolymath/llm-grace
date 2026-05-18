@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
+= ADR-0004: Attention model — decay vs. persist
+:status: PENDING
+
+== Status
+
+*PENDING* — seeded at the documented default; not yet ratified.
+
+== Context
+
+The protected session ("the drum", see ADR-0003) is chosen
+*dynamic-by-attention*: the heavy+moving session in the terminal the
+user most recently submitted a prompt in. `UserPromptSubmit` is the
+cheapest available proxy for the user's attention (keystroke-level
+focus is not exposed by the harness).
+
+Open question: should "attention" *decay* when the user walks away
+(after N minutes idle the drum loses its protected status), or
+*persist* until the user submits a prompt in a different terminal?
+
+== Decision (provisional default)
+
+*PERSIST.* A session the user set working stays the drum even if the
+user steps away, until the user explicitly shifts attention by
+prompting in another terminal. Rationale: a long-running job the user
+launched and walked away from is exactly the work most worth
+protecting; decaying its protection mid-run would punish the common
+"kick it off and leave it" pattern.
+
+== Consequences / revisit triggers
+
+* If an abandoned terminal that is genuinely stuck (heat, no motion)
+  retains protection purely because it was last-touched, the
+  heat-vs-motion classifier (ADR-0003) must still demote it — persist
+  protects *attention*, not *stalled* work. Confirm the interaction is
+  correct under test.
+* Revisit if real usage shows stale protection starving newer active
+  work.
+
+== Resolution
+
+Unresolved. To be ratified or flipped before the test-first build
+graduates to global scope.

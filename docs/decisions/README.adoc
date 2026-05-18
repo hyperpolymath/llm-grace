@@ -1,1 +1,18 @@
-= decisions Unit
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
+= Architecture Decision Records
+
+[cols="1,4,1",options="header"]
+|===
+| ADR | Title | Status
+
+| link:0001-adopt-rsr-standard.adoc[0001] | Adopt the RSR standard | Accepted
+| link:0002-estate-tech-debt-compounding-fixes.adoc[0002] | Estate tech-debt compounding fixes | Accepted
+| link:0003-graceful-degradation-architecture.adoc[0003] | Graceful-degradation architecture (full design) | Accepted
+| link:0004-attention-decay-vs-persist.adoc[0004] | Attention model — decay vs. persist | *PENDING*
+| link:0005-licensing-mpl-now-pmpl-overlay-later.adoc[0005] | Licensing posture + recorded licensing debt | Accepted
+|===
+
+ADR-0003 is the load-bearing design (the desktop design doc, verbatim).
+ADR-0004 is the single open dial. ADR-0005 records the MPL-2.0 posture
+and the tracked licensing debt.

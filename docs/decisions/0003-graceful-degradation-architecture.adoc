@@ -1,0 +1,384 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
+
+= Graceful Degradation for Concurrent Claude Sessions — Design Decisions
+Jonathan Jewell
+2026-05-18
+:toc: left
+:icons: font
+
+A living design doc to think against. Captures *why*, not just *what*.
+Status: design converging; 5 open questions flagged, build not started.
+
+== Origin / the problem this solves
+
+Real incident: four Claude terminals exited simultaneously to the shell.
+Diagnosed as the *WSL VM itself* being OOM-killed by Windows — nothing
+backed off, so everything died ungracefully and at once.
+
+Goal: voluntary load-shedding *before* the hard-reset point, so that
+under resource pressure sessions degrade gracefully in priority order,
+and the work that matters survives.
+
+== Guiding principle
+
+[quote]
+____
+*Protect motion, not mass. Pause heat, not size.*
+____
+
+Size is a bad proxy for value. The biggest consumer is often the
+*broken* one (thrashing / stuck / runaway) — exactly the thing you must
+*not* protect while it strangles productive work.
+
+Theory of Constraints framing (user's): exploit the constraint,
+subordinate everything else to it — but a *jammed* machine is not the
+constraint, it is a blockage. You do not subordinate the plant to a
+broken drum; you flush it.
+
+User's own rationale for the earlier hesitation, recorded verbatim in
+spirit: _"I hate the idea of blockage being protected — but my brain is
+not (officially at least) drained by noticing it, so I would notice
+without that cost."_ i.e. the human can cheaply detect heat-no-motion;
+the system should make that detection cheap too, not expensive.
+
+== The Windows inversion (why this is not the pattern you fear)
+
+Windows-trained expectation: trouble -> load a heavyweight diagnostic
+tool -> the tool itself tips it over -> hard reset -> read the crash
+dump.
+
+This design is the exact inverse. There is no tool to load and no dump
+to read. Diagnosis is read from *exhaust the system already emits*
+(`/proc` counters that exist whether observed or not). Observation costs
+~nothing, so it can run *continuously and early*, before the
+hard-reset point.
+
+== Mechanism
+
+* *The lever*: a `PreToolUse` hook. Before a tool runs, a shell command
+  inspects cheap signals and may *block by sleeping inside the hook
+  itself* — a true pause: agent waits, *zero tokens, zero CPU*, until
+  pressure clears (then silently continues) or a max-wait elapses.
+* *Cross-terminal coordination*: separate terminals = separate
+  processes, coordinating via a shared dir `~/.claude/loadshed/`. Each
+  session drops a heartbeat (pid, RSS, state, last-user-input). One
+  monitor samples + writes a ranking; every session's hook reads it.
+* *Attention signal*: a `UserPromptSubmit` hook stamps
+  `last_input=now` on that session's heartbeat. This is the
+  cheapest available proxy for "where the user's attention is".
+
+== Classification: the 2x2 (motion x mass)
+
+Heat-vs-motion is observable for *free* from outside: `stat` the
+session's transcript `.jsonl` — is it growing? new assistant/tool-result
+lines? That is a timestamp + byte delta. The big session is *never
+touched* — no attach, no poke, no crash risk, no time sink.
+
+[cols="1,2,2"]
+|===
+| | *Moving* (transcript advancing) | *Stalled* (no progress > T)
+
+| *Heavy RSS*
+| THE DRUM — PROTECT. Subordinate others to feed it headroom. Push through.
+| HEAT, NO MOTION — pause/checkpoint FIRST + flag the user. Never protected for being big.
+
+| *Light RSS*
+| Good cheap work — pause late, smallest-first
+| Idle/waiting (on user, or a watcher) — pause first, loses nothing
+|===
+
+== "Hairy" = all factors, but *interpreted*
+
+~6 cheap counters, single-line `/proc` reads, sampled ~10s by the one
+monitor. Read as *combinations that name the kind of trouble*, not a
+single threshold.
+
+[cols="2,2,3"]
+|===
+| Signal | Source | Tells you
+
+| `MemAvailable`, `SwapFree` | /proc/meminfo | real headroom
+| `pswpout` delta | /proc/vmstat | pages evicted to disk *now* = active thrash
+| `%iowait` delta | /proc/stat | CPU stalled waiting on disk
+| disk `io_ticks` delta | /proc/diskstats | disk saturation
+| loadavg vs nproc | /proc/loadavg | run-queue vs actual cores
+| GPU util / VRAM | nvidia-smi (~45s) | context only — never a shed trigger
+|===
+
+Named signatures:
+
+* 🔴 *Swap-death / pre-OOM* — `pswpout` rising + high iowait + disk
+  saturated + load >> cores + *low userspace CPU%*. The user's intuited
+  "disk thrashing, low CPU" freebie. The four-crash precursor. Sheds
+  hard and fast.
+* 🟡 *Memory cliff* — `MemAvailable` slope steeply negative even before
+  swap moves -> shed proactively, gently.
+* 🟢 *Compute-saturated* — high CPU%, load ≈ cores, low iowait, memory
+  flat. Busy, not dangerous. *Does NOT shed.*
+* 🟢 *GPU-saturated* — VRAM/util pinned, RAM fine. Training by design.
+  *Explicitly ignored for shedding* (does not threaten the VM). Used
+  only as "this heavy session is GPU-bound and moving -> protect".
+* ⚪ *Idle tell* — near-zero CPU + near-zero I/O + stale transcript ->
+  parked waiting. Safest pause target, costs nothing.
+
+Net: RAM-thrash and the memory cliff trigger backoff; pure CPU or GPU
+saturation deliberately do not.
+
+== The degradation ladder — per-session escalation, climbing the chain
+
+User's model (answers Q1, supersedes the old "pause-all-and-wait"):
+each session walks its *own* ladder; the cascade climbs the priority
+chain, lowest-attention first, the drum last.
+
+Per-session rungs:
+
+[arabic]
+. *ACTIVE* — normal.
+. *PAUSED [wait]* — block & wait, 0 tokens/CPU, polling for relief.
+  ** If conditions *improve* -> *GO* (resume exactly where it was).
+  ** If the pause *drags* (sub-threshold) -> begin *TRICKLE* in the
+     background: incrementally write a few-KB resume note as insurance,
+     so even a sudden hard VM kill loses ~nothing. (Trickle is folded
+     into a prolonged pause, not a separate rung the user must reason
+     about.)
+. *CHECKPOINT* — pause stayed bad / worsened -> write the full resume
+  note, then *HOLD*. This is a *latch*: the session does NOT auto-resume
+  even if pressure later clears. It stops and waits for a human decision
+  ("if it's this bad and didn't unpause, stop until we know why"). The
+  loud consciousness alert fires here.
+. *TERMINATE* — clean exit; state already saved at CHECKPOINT, nothing
+  lost. Triggered by: still sliding after checkpoint; OR the *flap rule*
+  — a 2nd CHECKPOINT for the same session within a rolling ~15–30 min
+  window means stop dithering and do a proper controlled shutdown.
+  *Never auto-relaunched* — a human brings it back, by choice, or not.
+
+Then the same escalation moves to the next session up the chain.
+
+*Drum exception*: when escalation reaches the protected (attention)
+session, its TERMINATE is not a silent exit — it *checkpoints, then
+ALERTs the user head-on* (timestamped chat note + desktop notification
++ a top-level `~/.claude/loadshed/WHAT-HAPPENED.txt` story file), then
+exits. So even a total wipeout leaves the loudest possible breadcrumb.
+
+*Recovery is asymmetric*: a PAUSED session auto-resumes fast and
+silently when conditions improve — cheap, reversible, fine to bounce.
+A session that reached CHECKPOINT does *not* auto-resume — checkpoint
+is a human-in-the-loop latch. Cheap relief (unpausing) is always
+exhausted before valuable work is touched, but once we have had to
+checkpoint, the system stops and asks rather than silently carrying on.
+
+*INVARIANT*: TERMINATE is always checkpoint-then-exit. "All off" can
+only ever mean *recoverable*, never *lost*.
+
+*CONSCIOUSNESS RULE*: PAUSE is silent and unattended. The instant *any*
+session reaches CHECKPOINT, the daemon must rise to the user's
+consciousness — loud, unmissable, whether the user is present or away
+(desktop notification + chat note + WHAT-HAPPENED file). Invisibility of
+the daemon is permitted *only* because this guarantee holds. Checkpoint
+= "something genuinely bad happened, you need to know now".
+
+*NO AUTO-RELAUNCH (absolute)*: a TERMINATED session is never restarted
+automatically, under any condition. CHECKPOINT does not auto-resume
+either (it latches). The human resumes/relaunches deliberately, or not
+at all. The system's job is to preserve and explain, never to silently
+carry on past a serious event.
+
+*AUTOPSY REPORT*: on TERMINATE, if the system is still alive enough,
+emit a per-session human-readable post-mortem — "here you go, autopsy
+report": which rungs were hit and when (wall-clock), the trigger
+signature (e.g. swap-death: pswpout↑ + iowait↑ + low CPU%), this
+session's heat/motion classification over time, what it had completed
+vs. left pending, and the resume pointer. Distinct from the resume note
+(for relaunch) and WHAT-HAPPENED (global story). Because the LMDB ledger
+holds the raw timeline, the autopsy is *reconstructable post-hoc* even
+if the emit step itself could not run — a returning human or the next
+session can generate it from the ledger. Handed over immediately if
+alive; recoverable later if not.
+
+*EPISODE AGGREGATION (system autopsy)*: per-session autopsies aggregate
+into one interleaved chronological timeline of the whole incident —
+because all events share the single ordered LMDB ledger, this is a
+direct read, not a stitch. It must characterise the *shape*, not just
+list events: independent shed vs. flapping (pause/resume oscillation)
+vs. correlated *mass checkpointing* vs. full *death-spiral* (everything
+checkpointing toward termination together). This is the upgraded
+WHAT-HAPPENED: "how it all went wobbly" — which terminal moved first,
+how pressure propagated, whether the cascade was orderly or a spiral.
+The thing you read on return to understand the episode at a glance.
+
+== Return-state semantics (acceptance test)
+
+The design is correct iff, on returning, the user can correctly read
+the situation from what they see:
+
+[cols="2,3,2"]
+|===
+| Comes back to… | Should be able to think… | Guaranteed by
+
+| All off
+| "Wow, that was bad — but I have it all."
+| TERMINATE = checkpoint-then-exit invariant
+
+| One paused, rest gone
+| "Those are safe… but what happened here?"
+| timestamped chat trail + survivor still holding
+
+| Pauses logged, all alive
+| "Bumpy time since I've been gone."
+| timestamped on/off markers written in-transcript
+|===
+
+== LOCKED decisions
+
+* Drum selection: *dynamic-by-attention*. Protect the heavy+moving
+  session in the terminal the user most recently submitted a prompt in.
+  No bookkeeping; attention = the truth signal.
+  ** Nuance ("of me"): the real target is *the user's* attention.
+     `UserPromptSubmit` is the cheapest available proxy; keystroke-level
+     focus is not exposed by the harness. Proxy gap noted as an open
+     refinement (see Q-A).
+* Heat-vs-motion via passive transcript observation only. Never touch
+  the suspect process.
+* RAM = hard trigger; CPU = soft/secondary; GPU = informational only.
+* Stall window T ≈ 5 min, with a *CPU-active override* (a session whose
+  child is genuinely burning CPU counts as moving even if the transcript
+  is briefly quiet — protects long legit builds / `cargo bench`).
+* Global scope, kill-switch file `~/.claude/loadshed/OFF`.
+* Build *test-first*: proven against a controlled memory balloon in one
+  throwaway session before going global.
+* *(Q1 answered)* Away/critical = per-session cascading ladder
+  PAUSE->(recover:GO)/(worsen:CHECKPOINT)->(worsen:TERMINATE), climbing
+  the chain, drum last. Not pause-all-and-wait.
+* *(Q3 answered)* Every PAUSE/CHECKPOINT/TERMINATE transition, on *and*
+  off, writes a wall-clock-timestamped line into the chat/transcript —
+  explicitly for post-hoc "what happened while I was gone" forensics.
+  Channel mapping: *PAUSE -> statusline only* (quiet tier, matches
+  "pause is silent"); *CHECKPOINT -> statusline + desktop
+  notification* (the loud rise-to-consciousness; one-shot
+  `notify-send`/toast fired only on the rare event, never polled — on
+  WSL2 via a PowerShell/`wsl-notify-send` shim, still trivial).
+* *(Q2 answered)* Invisible self-healing daemon (auto-start, self-
+  restart, untended) — permitted *only* because the CONSCIOUSNESS RULE
+  binds it: any CHECKPOINT forces a loud, unmissable surfacing to the
+  user, present or away.
+* *(Q4 answered)* Unified shared *LMDB ledger* every session
+  autoconnects to at startup — routine trickle = tiny commits,
+  checkpoint = fuller bounded commit, coordination state + transition
+  log live there too. Crash-safe (committed txn survives a kernel/VM
+  kill). Big-file snapshots remain opt-in + acknowledged I/O-bound.
+  Kill-switch stays a *plain file*, never in LMDB.
+* *(Q5 answered)* No auto-relaunch after TERMINATE — absolute. PAUSE
+  auto-resumes fast/silent. CHECKPOINT is a human-in-the-loop latch
+  (no auto-resume even if pressure clears — stop until cause known).
+  Flap rule: 2nd checkpoint for one session within ~15–30 min ->
+  controlled shutdown. On TERMINATE emit an *autopsy report* (per
+  session post-mortem; reconstructable from the ledger if the emit
+  step itself can't run). Residual quiet "safe to relaunch if you
+  choose" ping = yes, informational only.
+
+== OPEN questions (defaults marked; steer in a word)
+
+[qanda]
+Q-A — attention proxy refinement::
+  `UserPromptSubmit` = "attention of me" proxy. Good enough, or do we
+  want a decay rule (e.g. attention expires after N min idle so a
+  walked-away terminal stops being "the drum")?
+  *DEFAULT*: attention persists until you type in another terminal
+  (a session you set working stays the drum even if you step away).
+
+_(Q1, Q2, Q3 answered — see LOCKED decisions.)_
+
+_(Q4 answered — shared LMDB ledger; see dedicated section + LOCKED.)_
+
+_(Q5 answered — see LOCKED + ladder latch/flap rules + autopsy +
+episode aggregation.)_
+
+== Shared LMDB ledger (resume + coordination substrate)
+
+User's Q4 resolution, upgraded from "tiny note vs full snapshot" to a
+single crash-safe store every Claude autoconnects to at startup.
+
+Roles:
+
+* *Routine* — each session trickles a tiny record (where I was, next
+  intended step, transcript cursor/offsets). Cheap, frequent, safe even
+  mid-thrash because records are small.
+* *Coordination* — heartbeats, RSS, motion/heat classification,
+  attention timestamps, pause/checkpoint state. Replaces the racy
+  directory-of-files; one atomic source of truth, multi-process.
+* *Transition log* — every PAUSE/CHECKPOINT/TERMINATE on+off event,
+  wall-clock-stamped, all sessions in one ordered store. Powers both
+  the per-session autopsy and the aggregated *episode timeline / system
+  autopsy* (shape of the incident: orderly shed vs. flap vs. mass
+  checkpoint vs. death-spiral) — and the "bumpy time since I've been
+  gone" chat reconstruction. All derived deterministically from the
+  log, not hand-rolled. Single shared ledger = aggregation is a read,
+  not a stitch.
+* *Emergency* — a committed LMDB txn is atomic and torn-write-proof, so
+  whatever was trickled survives a kernel/WSL-VM OOM kill (unlike a
+  buffered flat-file append that may die in page cache).
+
+Honest boundaries (so the design does not over-promise):
+
+* LMDB is a *ledger, not a core dump*. It persists only what we
+  explicitly transact — it cannot auto-capture uncommitted RAM.
+* It gives atomicity + a good write path, *not* free bytes. Streaming
+  large in-flight *file blobs* during swap-death still adds real disk
+  I/O. So: small records flow freely even mid-thrash; a genuine
+  full-file snapshot stays the deliberate last resort, opt-in, and
+  acknowledged as I/O-bound. LMDB's gift there is "no half/torn state",
+  not "no cost".
+* A writer dying mid-txn cannot corrupt the DB (txn simply doesn't
+  commit) — strictly safer than flat files.
+* Under true memory scarcity the mmap pages are themselves pressure;
+  keep records small and the working set tiny. LMDB mitigates
+  *durability*, not *scarcity*.
+
+Build-time (not decided here, flagged): the small writer helper's
+implementation language — lean to Zig per estate FFI/infra policy;
+avoid Python tooling. `map_size` pre-sized generously (sparse, 64-bit,
+e.g. 256MB–1GB). Kill-switch deliberately excluded from LMDB.
+
+== Ethos / what success looks like (anti-failure-theatre)
+
+The autopsy, episode timeline, and death-spiral narrative are
+*fallbacks you hope never to read*, not features to admire. Every
+forensics tool risks quietly rewarding failure — the impressive parts
+only shine when things go badly. Guard explicitly:
+
+* *Success metric*: ratio of silent auto-resumed PAUSEs to CHECKPOINTs
+  should be vast. Many invisible cheap pauses, near-zero loud events.
+* *Non-goal*: producing beautiful incident reports. If autopsies are
+  read often, the tool has failed at its real job regardless of how
+  good they are.
+* *Design bias*: keep the common path (PAUSE -> recover -> GO) silent,
+  cheap, and boring. The loud machinery is insurance, not theatre.
+* *Honest licence framing*: no warranty (the inverse of the "we owe you
+  £1m" joke). The promise is not "it won't go wrong" but "when it does,
+  you come back to an autopsy, not a smoking crater."
+
+== Safety rails (non-negotiable)
+
+* Kill-switch `~/.claude/loadshed/OFF` -> hook becomes a no-op
+  instantly, everywhere. *Plain file, never inside LMDB* — must work
+  even if LMDB itself is wedged.
+* Every blocking sleep has a hard max-wait; never an unbounded freeze.
+* PreToolUse gates *heavy* tools only (Bash, Agent/Task, WebFetch) for
+  shedding; trivial Read/Edit never freeze.
+* Thresholds calibrated to the actual box (WSL `.wslconfig` cap,
+  MemTotal/Swap) — measured, not assumed.
+* Promote to global only after the balloon test passes in isolation.
+
+== Next step
+
+Everything is now locked except *one* dial:
+
+* *Q-A* — does "attention" decay when you walk away (e.g. after N min
+  idle the drum is no longer protected), or persist until you type in
+  another terminal? *DEFAULT: persists* (a session you set working
+  stays the drum even if you step away).
+
+Confirm or flip Q-A, then "go" — I measure the box (`.wslconfig` cap,
+MemTotal/Swap) and build test-first against a memory balloon in one
+throwaway session before anything goes global.

@@ -1,80 +1,91 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
-// SPDX-FileCopyrightText: {{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}})
-= {{PROJECT_NAME}}
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
+= llm-grace
 :toc:
 :toc-placement: preamble
 
-image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=opensourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://{{FORGE}}/{{OWNER}}/{{REPO}}"]
-image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
-image:https://api.thegreenwebfoundation.org/greencheckimage/{{FORGE}}[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url={{FORGE}}"]
+image:https://img.shields.io/badge/License-MPL--2.0-brightgreen.svg[License: MPL-2.0,link="https://www.mozilla.org/MPL/2.0/"]
+image:https://img.shields.io/badge/status-design-orange.svg[Status: design]
 
-{{ONE_PARAGRAPH_PURPOSE}}
+Graceful degradation for concurrent LLM/agent terminals. When system
+resources get hairy, sessions back off *voluntarily and in priority
+order* — before the OS OOM-kills everything at once — so the work that
+matters survives and a returning human comes back to an *autopsy, not a
+smoking crater*.
 
-[NOTE]
-====
-This repository was created from
-https://github.com/hyperpolymath/rsr-template-repo[rsr-template-repo],
-the neutral RSR (Rhodium Standard Repository) skeleton. Before first use,
-replace every `{{PLACEHOLDER}}` marker with project-specific values:
+== Why
 
-[source,bash]
-----
-just init        # interactive bootstrap — prompts, replaces, validates
-----
+Run several agent terminals on one box and the failure mode is
+brutal: nothing backs off, memory craters, and the OS kills the whole
+VM — every session dies at once, ungracefully, mid-thought. `llm-grace`
+makes that failure *legible, bounded, and recoverable*.
 
-See link:.machine_readable/ai/PLACEHOLDERS.adoc[PLACEHOLDERS.adoc] for the
-full placeholder registry, and delete this NOTE block once `just init`
-has been run.
-====
+== How (one paragraph)
 
----
+A tiny monitor reads cheap signals the kernel already emits (`/proc`
+counters — memory, swap-out rate, iowait, disk saturation, loadavg)
+and reads them as *signatures*, not thresholds: the classic
+"disk-thrash + low CPU" pattern is the pre-OOM tell. Sessions
+coordinate through one shared crash-safe LMDB ledger. Under pressure,
+the *least valuable* work yields first — value measured as motion, not
+size, so a thrashing runaway is shed before productive work — climbing
+a per-session ladder: silent PAUSE (auto-resumes) → CHECKPOINT (a
+human-in-the-loop latch, loud) → clean TERMINATE (state already saved,
+never auto-relaunched). Every transition is timestamped; terminated
+sessions get a per-session autopsy, and the whole episode aggregates
+into one timeline so you can see *how it went wobbly*.
 
-== What it is
+== Ethos (anti-failure-theatre)
 
-{{PROJECT_DESCRIPTION}}
+The autopsy and death-spiral timeline are fallbacks you hope never to
+read, *not features to admire*. Success is the tool's own
+invisibility: thousands of silent cheap pauses, near-zero loud events.
+If you read autopsies often, the tool has failed at its real job. No
+warranty — the promise is not "it won't go wrong" but "when it does,
+you'll know exactly what killed you, and nothing is lost."
 
-// Describe the project: what problem it solves, who it is for, and the
-// one capability that makes it worth using ({{PROJECT_UNIQUE_STRENGTH}}).
+== Status
 
-== Getting started
+Design phase. The architecture is decided and recorded as ADRs:
 
-=== Prerequisites
+* link:docs/decisions/0003-graceful-degradation-architecture.adoc[ADR-0003 — full architecture]
+* link:docs/decisions/0004-attention-decay-vs-persist.adoc[ADR-0004 — open dial (attention model), PENDING]
+* link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005 — licensing posture + recorded licensing debt]
 
-// List language toolchains and the task runner. The RSR scaffold assumes
-// https://just.systems/[just] (task runner) and a Nix/Guix or devcontainer
-// environment; add project-specific prerequisites here.
+Build is tracked as native sub-issues under the requirements epic.
+First adapter targets Claude Code hooks (`PreToolUse`,
+`UserPromptSubmit`, `SessionStart`); the core idea is adapter-agnostic.
+It will be built *test-first* against a controlled memory balloon in an
+isolated session before anything goes global.
 
-=== Install from source
+== Licence + recorded licensing debt
 
-[source,bash]
-----
-git clone https://{{FORGE}}/{{OWNER}}/{{REPO}}
-cd {{REPO}}
-just bootstrap
-----
+Operative licence: *MPL-2.0* (see link:LICENSE[LICENSE]) — real,
+established, and legally effective today.
 
-=== Usage
+PMPL (Palimpsest) is *not* claimed standalone. Until the governing
+council and an established legal code exist, a bare PMPL claim has no
+force and would fall immediately. PMPL is therefore only ever intended
+as a *future overlay on top of MPL-2.0*, not a replacement and not a
+present claim.
 
-// Show the minimal end-to-end example for {{PROJECT_NAME}}.
+This is explicit *licensing debt*:
 
-== AI installation
+* The repo was scaffolded from
+  https://github.com/hyperpolymath/rsr-template-repo[rsr-template-repo],
+  whose default is `PMPL-1.0-or-later`. ~199 files still carry that
+  SPDX header.
+* Debt 1 — *relicense sweep*: replace all template `PMPL-1.0-or-later`
+  SPDX headers with `MPL-2.0`; complete the RSR `just init` placeholder
+  bootstrap. (Tracked sub-issue, not half-applied.)
+* Debt 2 — *PMPL-overlay migration*: when the council + legal code are
+  established, move to "MPL-2.0 with PMPL overlay" deliberately and
+  correctly. (Tracked, gated on that external precondition.)
 
-[TODO-AI-INSTALL]
+See link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005].
 
-// This marker is required by docs/AI_INSTALLATION_GUIDE.adoc and is checked
-// by `just validate-ai-install`. Replace it with the project-specific AI
-// installation section before release.
+== Provenance / housekeeping
 
-== Contributing
-
-See link:.github/CONTRIBUTING.md[CONTRIBUTING] and
-link:.github/CODE_OF_CONDUCT.md[CODE_OF_CONDUCT].
-
-== Security
-
-See link:.github/SECURITY.md[SECURITY] and
-link:.well-known/security.txt[.well-known/security.txt] (RFC 9116).
-
-== License
-
-PMPL-1.0-or-later.  See link:LICENSE[LICENSE].
+Scaffolded from `rsr-template-repo` (the neutral RSR skeleton). The
+full RSR placeholder bootstrap and the per-file SPDX relicense are
+tracked build sub-issues rather than rushed inline — foundation-first.
