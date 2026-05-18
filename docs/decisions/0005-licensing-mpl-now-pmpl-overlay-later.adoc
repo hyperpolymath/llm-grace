@@ -35,15 +35,28 @@ claim.
 
 == Licensing debt (recorded, tracked)
 
-* *Debt 1 — relicense sweep*: ~199 template files still carry
-  `PMPL-1.0-or-later`. Replace with `MPL-2.0`; complete the RSR
-  `just init` placeholder bootstrap in the same pass. Tracked as a
-  build sub-issue (deliberately not half-applied — foundation-first).
+* *Debt 1 — relicense (MANUAL ONLY)*: ~199 template files still carry
+  `PMPL-1.0-or-later`. Corrected *by the owner, file-by-file, over
+  time*. NO automated or bulk sweep, ever (see hard constraint below).
+  The `just init` placeholder bootstrap is separate ordinary
+  scaffolding and may be done normally; the SPDX relicensing is not.
 * *Debt 2 — PMPL overlay migration*: when the council + established
   legal code exist, deliberately move to "MPL-2.0 with PMPL overlay".
   Gated on that external precondition; tracked, not actioned now.
 
+== Hard constraint: licence edits are manual, owner-only
+
+Never automate or bulk-edit licence / SPDX headers in this repo. Every
+prior automated attempt across the estate scrambled identifiers and —
+critically — rewrote third-party / component licence headers, falsely
+attributing other people's licence changes to the owner. Relicensing
+is manual, file-by-file, owner-driven. Agents may author *new* files
+with correct SPDX and may set this repo's own top-level `LICENSE`, but
+must never sweep existing or third-party headers. The relicense debt
+is a tracked *manual ledger*, not an automatable task.
+
 == Consequences
 
 Honest, legally-real licence today; aspirational PMPL future is
-documented as debt, not silently asserted.
+documented as debt, not silently asserted. Cleanup integrity preserved
+by forbidding automation.
