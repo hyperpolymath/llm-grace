@@ -3,12 +3,12 @@
 # Converted from ECOSYSTEM.scm
 
 [metadata]
-project = "{{PROJECT_NAME}}"
-ecosystem = "{{OWNER}}"
+project = "llm-grace"
+ecosystem = "hyperpolymath"
 
 [position]
-type = "{{PROJECT_KIND}}"
-purpose = "{{PROJECT_PURPOSE}}"
+type = "tool"
+purpose = "Graceful degradation for concurrent LLM/agent terminals: cheap signature-based load-shedding with a crash-safe ledger and legible post-mortems"
 
 [pipeline]
 position = ""

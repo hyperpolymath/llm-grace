@@ -57,11 +57,11 @@ check_placeholder() {
         fail=1
     fi
 }
-check_placeholder "README.adoc"                        "{{PROJECT_NAME}}"
-check_placeholder "0-AI-MANIFEST.a2ml"                 "{{PROJECT_NAME}}"
-check_placeholder "0-AI-MANIFEST.a2ml"                 "{{PROJECT_PURPOSE}}"
-check_placeholder ".machine_readable/6a2/ECOSYSTEM.a2ml" "{{PROJECT_NAME}}"
-check_placeholder ".machine_readable/ECOSYSTEM.a2ml"   "{{REPO}}"
+check_placeholder "README.adoc"                        "llm-grace"
+check_placeholder "0-AI-MANIFEST.a2ml"                 "llm-grace"
+check_placeholder "0-AI-MANIFEST.a2ml"                 "Graceful degradation for concurrent LLM/agent terminals: cheap signature-based load-shedding with a crash-safe ledger and legible post-mortems"
+check_placeholder ".machine_readable/6a2/ECOSYSTEM.a2ml" "llm-grace"
+check_placeholder ".machine_readable/ECOSYSTEM.a2ml"   "llm-grace"
 
 # ── Check B: no embedded project-clone subtree ───────────────────────────────
 while IFS= read -r tracked; do

@@ -27,7 +27,7 @@ Inventory snapshot at audit time:
 
 | Placeholder badge tokens in README
 | `README.adoc`
-| `{{OPENSSF_PROJECT_ID}}`, `{{OWNER}}`, `{{REPO}}`
+| `{{OPENSSF_PROJECT_ID}}`, `hyperpolymath`, `llm-grace`
 | placeholder
 | Template placeholders are intentional pre-bootstrap content.
 | Keep; document clearly as template tokens.

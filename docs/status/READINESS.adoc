@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Copyright (c) {{CURRENT_YEAR}} {{AUTHOR}} <{{AUTHOR_EMAIL}}>
-= {{PROJECT_NAME}} Component Readiness Assessment
+// Copyright (c) 2026 Jonathan Jewell <j.d.a.jewell@open.ac.uk>
+= llm-grace Component Readiness Assessment
 
-*Standard:* link:https://{{FORGE}}/{{OWNER}}/standards/tree/main/component-readiness-grades[Component Readiness Grades (CRG) v2.0 STRICT] +
-*Assessed:* {{CURRENT_DATE}} +
-*Assessor:* {{AUTHOR}} +
+*Standard:* link:https://github.com/hyperpolymath/standards/tree/main/component-readiness-grades[Component Readiness Grades (CRG) v2.0 STRICT] +
+*Assessed:* 2026-05-18 +
+*Assessor:* Jonathan Jewell +
 *Previous assessment:* _<date or "none">_
 
 *Current Grade:* X
@@ -59,7 +59,7 @@ Below B, any publication must be explicitly abstract or provisional.
 
 '''
 
-== 2. Headline Evidence (as of {{CURRENT_DATE}})
+== 2. Headline Evidence (as of 2026-05-18)
 
 [cols="2,3,3", options="header"]
 |===
@@ -67,7 +67,7 @@ Below B, any publication must be explicitly abstract or provisional.
 
 | Test count | _<N>_ | `.machine_readable/6a2/STATE.a2ml` or CI
 | Formal-verification posture | _<N `believe_me` / `sorry` / `Admitted` — irreducible only>_ | grep of proof dirs
-| Dangerous patterns (`assert_total`, `unsafeCoerce`, `Obj.magic`) | _<N>_ | grep {{CURRENT_DATE}}
+| Dangerous patterns (`assert_total`, `unsafeCoerce`, `Obj.magic`) | _<N>_ | grep 2026-05-18
 | Per-unit README coverage | _<M/N (percentage)>_ | filesystem scan of unit dirs
 | CI status | _<workflow name + last green run>_ | `.github/workflows/`
 | RSR mandatory workflows | _<N/17>_ | `.github/workflows/`
@@ -87,9 +87,9 @@ unless noted.
 |===
 | Component | Grade | Posture | Evidence Summary | Promotion blocker | Last Assessed
 
-| _<component 1>_ | X/F/E/D/C/B/A | _<shorthand>_ | _<what was checked + counts>_ | _<specific, actionable gap to next grade>_ | {{CURRENT_DATE}}
-| _<component 2>_ | … | … | … | … | {{CURRENT_DATE}}
-| _<component 3>_ | … | … | … | … | {{CURRENT_DATE}}
+| _<component 1>_ | X/F/E/D/C/B/A | _<shorthand>_ | _<what was checked + counts>_ | _<specific, actionable gap to next grade>_ | 2026-05-18
+| _<component 2>_ | … | … | … | … | 2026-05-18
+| _<component 3>_ | … | … | … | … | 2026-05-18
 |===
 
 *Rules of thumb for populating this table:*
@@ -164,7 +164,7 @@ Real-world external feedback confirming value. Populate
 
 '''
 
-== 7. Summary ({{CURRENT_DATE}})
+== 7. Summary (2026-05-18)
 
 * Project grade: _<grade>_. Why: _<1-2 line justification>_.
 * Delta since last assessment: _<what changed; none if first assessment>_.

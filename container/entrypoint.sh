@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# {{PROJECT_NAME}} container entrypoint
+# llm-grace container entrypoint
 #
 # Handles signal propagation, startup logging, and health check
 # preparation before exec-ing into the main application process.
@@ -15,7 +15,7 @@ set -e
 # when Podman sends stop signals (e.g. `podman stop`, `selur-compose down`).
 
 cleanup() {
-    echo "Received shutdown signal — stopping {{SERVICE_NAME}}..."
+    echo "Received shutdown signal — stopping llm-grace..."
     # If the main process is backgrounded, kill it here:
     # kill "$MAIN_PID" 2>/dev/null || true
     # wait "$MAIN_PID" 2>/dev/null || true
@@ -27,7 +27,7 @@ trap cleanup TERM INT
 # Startup logging
 # ---------------------------------------------------------------------------
 
-echo "Starting {{SERVICE_NAME}}..."
+echo "Starting llm-grace..."
 echo "  Host: ${APP_HOST:-[::]}"
 echo "  Port: ${APP_PORT:-{{PORT}}}"
 echo "  Data: ${APP_DATA_DIR:-/data}"
@@ -56,8 +56,8 @@ fi
 #
 # TODO: Replace the command below with your application binary.
 # Examples:
-#   exec /app/{{SERVICE_NAME}}
-#   exec /app/release/bin/{{SERVICE_NAME}} start
-#   exec /app/{{SERVICE_NAME}} serve --host "${APP_HOST}" --port "${APP_PORT}"
+#   exec /app/llm-grace
+#   exec /app/release/bin/llm-grace start
+#   exec /app/llm-grace serve --host "${APP_HOST}" --port "${APP_PORT}"
 
 exec "$@"

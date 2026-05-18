@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Template: rsr-template-repo/docs/status/PROOF-NEEDS.adoc
 // Authoritative master list: ~/Desktop/PROOF-REQUIREMENTS-MASTER.adoc
-= Proof Requirements — {{PROJECT}}
+= Proof Requirements — LLM_GRACE
 
 == Proof Tier
 

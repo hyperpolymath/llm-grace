@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Copyright (c) {{CURRENT_YEAR}} {{AUTHOR}} <{{AUTHOR_EMAIL}}>
+// Copyright (c) 2026 Jonathan Jewell <j.d.a.jewell@open.ac.uk>
 
-= {{PROJECT_NAME}} — CRG Audit ({{CURRENT_DATE}})
-{{AUTHOR}}
-{{CURRENT_DATE}}
+= llm-grace — CRG Audit (2026-05-18)
+Jonathan Jewell
+2026-05-18
 :toc:
 :sectnums:
 
@@ -19,7 +19,7 @@
 
 == Scope and Standard
 
-Evaluates the `{{REPO}}` repository against
+Evaluates the `llm-grace` repository against
 *Component Readiness Grades v2.0 (STRICT)*, 2026-03-30 revision.
 
 - Standard: `standards/component-readiness-grades/COMPONENT-READINESS-GRADES.md`
@@ -28,8 +28,8 @@ Evaluates the `{{REPO}}` repository against
   * `.machine_readable/6a2/STATE.a2ml` → `grade = "<declared>"`
   * `docs/READINESS.md` (if present) → per-component grades
   * Third-party badges (Glama, OpenSSF, etc.) if any — note date and scope
-- Audit date: {{CURRENT_DATE}}
-- Auditor: {{AUTHOR}}
+- Audit date: 2026-05-18
+- Auditor: Jonathan Jewell
 
 The audit grades the repo *as-is today*, not aspirationally.
 
@@ -50,7 +50,7 @@ The audit grades the repo *as-is today*, not aspirationally.
 
 Publication requires B+. Long alpha is discipline, not shame.
 
-== Evidence Inventory (verified {{CURRENT_DATE}})
+== Evidence Inventory (verified 2026-05-18)
 
 === Structural compliance (Grade D floor)
 
@@ -102,7 +102,7 @@ Do *not* mark PRESENT without citing the path.
 | Build-system policy (RSR R-020)
 
 | Remote
-| `git@{{FORGE}}:{{OWNER}}/{{REPO}}.git` (origin only) / drift
+| `git@github.com:hyperpolymath/llm-grace.git` (origin only) / drift
 | `git remote -v`
 |===
 
@@ -136,7 +136,7 @@ RSR compliance verdict: *met* / *partial* / *not met* — Grade D floor satisfie
 
 | Dangerous-pattern scan (`assert_total`, `Admitted`, `sorry`, `unsafeCoerce`, `Obj.magic`)
 | N
-| Grepped {{CURRENT_DATE}}.
+| Grepped 2026-05-18.
 |===
 
 === Test matrix
@@ -282,7 +282,7 @@ them. Examples:
 
 - `docs/READINESS.md` — per-component table. Note v1.0-vs-v2.0 schema alignment.
 - `.machine_readable/6a2/STATE.a2ml` — authoritative self-declared state.
-- `docs/governance/CRG-LIFT-PLAN-{{CURRENT_DATE}}.adoc` — companion plan for
+- `docs/governance/CRG-LIFT-PLAN-2026-05-18.adoc` — companion plan for
   D→C (and medium-term C→B) lifts.
 - `docs/governance/CRG-CRITERIA.adoc` — boilerplate criteria doc.
 

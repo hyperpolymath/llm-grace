@@ -9,8 +9,8 @@
 (groove-manifest
   (version "1.0")
 
-  ; Service identity — replace {{REPO}} with your project name
-  (service "{{REPO}}")
+  ; Service identity — replace llm-grace with your project name
+  (service "llm-grace")
   (service-version "0.1.0")
 
   ; Primary port — MUST be unique across the ecosystem.

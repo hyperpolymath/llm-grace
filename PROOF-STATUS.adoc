@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Template: rsr-template-repo/PROOF-STATUS.adoc
 // Tracks proof completion. Requirements defined in PROOF-NEEDS.adoc
-= Proof Status — {{PROJECT}}
+= Proof Status — LLM_GRACE
 
 == Summary
 

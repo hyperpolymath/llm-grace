@@ -1,27 +1,27 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 #
-# Cerro Torre manifest for {{PROJECT_NAME}} .ctp bundle
+# Cerro Torre manifest for llm-grace .ctp bundle
 #
 # This manifest describes the container image for verified
 # container packaging. Used by `ct pack` to create .ctp bundles.
 
 [metadata]
-name = "{{SERVICE_NAME}}"
-version = "{{VERSION}}"
+name = "llm-grace"
+version = "0.0.0"
 revision = 1
-summary = "{{PROJECT_DESCRIPTION}}"
+summary = "Graceful degradation for concurrent LLM/agent terminals"
 description = """
-{{PROJECT_NAME}} — containerised service packaged as a verified
+llm-grace — containerised service packaged as a verified
 cerro-torre .ctp bundle with Ed25519 signing and full provenance
 tracking.
 """
-license = "{{LICENSE}}"
-homepage = "https://{{FORGE}}/{{OWNER}}/{{REPO}}"
-maintainer = "{{AUTHOR}} <{{EMAIL}}>"
+license = "MPL-2.0"
+homepage = "https://github.com/hyperpolymath/llm-grace"
+maintainer = "Jonathan Jewell <j.d.a.jewell@open.ac.uk>"
 
 [provenance]
-upstream = "https://{{FORGE}}/{{OWNER}}/{{REPO}}"
-import_date = {{CURRENT_DATE}}T00:00:00Z
+upstream = "https://github.com/hyperpolymath/llm-grace"
+import_date = 2026-05-18T00:00:00Z
 
 [dependencies]
 runtime = ["ca-certificates", "curl"]
@@ -35,7 +35,7 @@ APP_HOST = "[::]"
 APP_PORT = "{{PORT}}"
 
 [outputs]
-primary = "{{SERVICE_NAME}}"
+primary = "llm-grace"
 split = []
 
 [attestations]

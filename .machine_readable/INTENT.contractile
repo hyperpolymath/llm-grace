@@ -35,12 +35,12 @@
 
   ; === Purpose (what this repo IS) ===
   (purpose
-    "{{ONE_PARAGRAPH_PURPOSE}}"
+    "When system resources get hairy, agent terminals back off voluntarily and in priority order before the OS OOM-kills everything at once, so the work that matters survives and a returning human comes back to an autopsy, not a smoking crater."
   )
 
   ; === Anti-Purpose (what this repo is NOT — prevents scope creep) ===
   (anti-purpose
-    "{{ONE_PARAGRAPH_ANTI_PURPOSE}}"
+    "This is not a monitoring dashboard or an incident-theatre tool; its success is its own invisibility. If you read autopsies often, it has failed at its real job."
     ; Examples:
     ; "This is NOT a general-purpose database — it solves one specific problem."
     ; "This is NOT a framework — it is a library with a focused API."
@@ -65,7 +65,7 @@
 
   ; === Ecosystem Position ===
   (ecosystem
-    (belongs-to "{{MONOREPO_OR_STANDALONE}}")
+    (belongs-to "standalone")
     (depends-on ("{{DEP1}}" "{{DEP2}}"))
     (depended-on-by ("{{CONSUMER1}}" "{{CONSUMER2}}"))
   )

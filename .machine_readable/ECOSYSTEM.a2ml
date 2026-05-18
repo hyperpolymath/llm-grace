@@ -2,7 +2,7 @@
 ;; Ecosystem position and relationships
 (ecosystem
   (version "1.0.0")
-  (name "{{REPO}}")
+  (name "llm-grace")
   (type "library")
   (purpose "{{REPO_DESCRIPTION}}")
   (related-projects))
