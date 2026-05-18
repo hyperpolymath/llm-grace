@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Dependabot configuration for RSR-compliant repositories
+# Covers common ecosystems - remove unused ones for your project
+
+version: 2
+updates:
+  # GitHub Actions - always include
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # Rust/Cargo
+  #
+  # Previous note claimed `open-pull-requests-limit: 0` would suppress
+  # version-update PRs while leaving security PRs flowing. Empirically
+  # this stopped working: across the estate, repos using the template
+  # accumulated cargo HIGH/CRITICAL alerts with zero Dependabot PRs
+  # (intsoc-transactor: 11 cargo alerts, no PRs since Mar 2026).
+  # Restoring a real limit so security AND version-update PRs flow.
+  # Auto-merge for safe bumps is handled by dependabot-automerge.yml.
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      cargo:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Elixir/Mix
+  - package-ecosystem: "mix"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Node.js/npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Python/pip
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Nix flakes
+  - package-ecosystem: "nix"
+    directory: "/"
+    schedule:
+      interval: "weekly"

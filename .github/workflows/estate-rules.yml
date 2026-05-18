@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# Estate Rules — enforces hyperpolymath estate-wide conventions:
+#   * root shape (allowlist of permitted root entries)
+#   * AsciiDoc-by-default (no .md files under docs/)
+#   * V-lang is banned (no V-lang scaffolding or references)
+#   * neutral template (no project-specific identifiers — issue #45)
+#
+# Each rule is enforced by an executable check script under scripts/. Failures
+# are surfaced as workflow errors so the rule can't silently regress.
+
+name: Estate Rules
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+# Estate guardrail: cancel superseded runs so re-pushes don't pile up
+# queued runs across the estate. Safe here because this workflow only
+# performs read-only checks/lint/test/scan with no publish or mutation.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  estate-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Root shape allowlist
+        run: bash scripts/check-root-shape.sh .
+
+      - name: AsciiDoc by default (no .md under docs/)
+        run: bash scripts/check-no-md-in-docs.sh .
+
+      - name: No V-lang references
+        run: bash scripts/check-no-vlang.sh .
+
+      - name: Neutral template (no project identifiers)
+        run: bash scripts/check-no-project-identifiers.sh .

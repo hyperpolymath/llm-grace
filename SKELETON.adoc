@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: PMPL-1.0
+= RSR Skeleton: Generator-Derived
+
+The RSR *required-files set* in this repository is **not hand-maintained**.
+It is the canonical output of the skeleton generator in
+https://github.com/hyperpolymath/gitbot-fleet[`hyperpolymath/gitbot-fleet`]
+(`robot-repo-automaton skeleton`), and the
+`.github/workflows/skeleton-drift.yml` CI job fails if the two diverge —
+from either side.
+
+This closes the structural fix deferred by
+https://github.com/hyperpolymath/rsr-template-repo/issues/45[#45] /
+https://github.com/hyperpolymath/rsr-template-repo/issues/47[#47]
+(see https://github.com/hyperpolymath/rsr-template-repo/issues/48[#48]):
+the template can no longer silently drift from the canonical RSR contract.
+
+== Generator-derived files
+
+[cols="1,3",options="header"]
+|===
+| File | Purpose
+
+| `.gitignore`                          | Artefact / secret / temp exclusions
+| `.gitattributes`                      | LF enforcement + diff settings
+| `.editorconfig`                       | Cross-IDE editor settings
+| `.tool-versions`                      | asdf version pinning
+| `Justfile`                            | Task runner (Makefiles forbidden)
+| `.machine_readable/6a2/META.a2ml`     | Architecture decisions
+| `.machine_readable/6a2/STATE.a2ml`    | Project state / phase
+| `.machine_readable/6a2/ECOSYSTEM.a2ml`| Ecosystem positioning
+| `.machine_readable/6a2/PLAYBOOK.a2ml` | Executable procedures
+| `.machine_readable/6a2/AGENTIC.a2ml`  | AI agent operational gating
+| `.machine_readable/6a2/NEUROSYM.a2ml` | Symbolic semantics / proof obligations
+|===
+
+NOTE: This layout (`.machine_readable/6a2/\*.a2ml`) is the post-migration
+canonical form. The prose spec
+`hyperpolymath/standards` `standards-update/.meta/REQUIRED-FILES.md` is
+*stale* — it still lists root `\*.scm` + `Mustfile`, predating the
+estate-wide `.scm`->`.a2ml` migration. Reconciling that document is tracked
+separately and is out of scope for #48.
+
+== To change a required file
+
+Edit the canonical copy in
+`gitbot-fleet:robot-repo-automaton/templates/skeleton/`, then regenerate:
+
+[source,sh]
+----
+robot-repo-automaton skeleton emit .
+----
+
+Never edit the derived copies in this repo directly — the drift CI will
+reject it.

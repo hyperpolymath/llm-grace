@@ -1,0 +1,72 @@
+# Canonical root allowlist for RSR-templated repositories.
+#
+# Lists every entry permitted at the repository root.
+# Anything tracked at root that is not in this list is drift and
+# must be moved into the appropriate subdirectory (or added here
+# with a justification comment).
+#
+# Used by: scripts/check-root-shape.sh
+# Authority: TEMPLATE-STANDARDS-AUDIT.adoc, "Proposed Final Directory Map"
+#
+# Format: one entry per line; '#' starts a comment; trailing '/' marks a directory.
+# Blank lines and comment-only lines are ignored.
+
+# ─── Authority files (template-mandated) ─────────────────────────────────────
+README.adoc
+AUDIT.adoc
+EXPLAINME.adoc
+PROOF-NEEDS.adoc           # proof-obligation registry (estate authority file, peer of AUDIT.adoc)
+PROOF-STATUS.adoc          # proof-discharge status (estate authority file)
+READINESS.adoc             # release-readiness gate state (estate authority file)
+TEST-NEEDS.adoc            # required-test registry (estate authority file)
+TOPOLOGY.adoc              # repo/component topology (estate authority file)
+llm-warmup-dev.adoc        # LLM onboarding warm-up (developer); estate-standard root doc
+llm-warmup-user.adoc       # LLM onboarding warm-up (user); estate-standard root doc
+0-AI-MANIFEST.a2ml         # thin pointer to .machine_readable/0.1-AI-MANIFEST.a2ml
+LICENSE
+CHANGELOG.md
+
+# ─── Build entry points (must live at root for their tooling) ────────────────
+Justfile                   # delegates phases to build/just/*.just
+coordination.k9            # repo-local session binding (template-mandated)
+
+# ─── Conventional dotfiles (tool-required at root) ───────────────────────────
+.editorconfig
+.envrc
+.gitattributes
+.gitignore
+.tool-versions
+
+# ─── GitHub community-health files (root is a GitHub-recognised location) ─────
+# GitHub resolves these from .github/, the repo root, or docs/. The template
+# ships both root and .github/ copies as scaffolding; the ROOT copies are the
+# canonical, link-target ones per docs/governance/TEMPLATE-STANDARDS-AUDIT.adoc
+# ("Actual files are CONTRIBUTING.md … SECURITY.md. Fixed README links …").
+CONTRIBUTING.md
+SECURITY.md
+
+# ─── Directories ─────────────────────────────────────────────────────────────
+.devcontainer/             # VS Code dev container spec; tool-required at root
+.git/
+.github/                   # CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, workflows/
+.machine_readable/         # AI manifests, contractiles, custom-format configs
+.well-known/
+build/                     # contractile.just, setup.sh, flake.{nix,lock}, guix.scm, .guix-channel, Containerfile
+ci/                        # .gitlab-ci.yml, .pre-commit-config.yaml (root shims if tools require)
+docs/                      # onboarding/, status/, governance/, ...
+session/                   # dispatch.sh, custom-checks.k9, local-hooks.sh
+
+# Source / test / artifact trees (project-specific but conventional)
+src/
+tests/
+benches/
+examples/
+features/
+scripts/
+verification/
+container/                 # may host Containerfile if not at build/
+
+# ─── Tolerated pending follow-up (re-evaluate when item lands) ───────────────
+.gitlab-ci.yml             # TODO: relocate to ci/.gitlab-ci.yml after GitLab project-setting update
+.pre-commit-config.yaml    # TODO: relocate to ci/.pre-commit-config.yaml after invocation pattern decided
+tools/                     # TODO: consolidate with scripts/ or document the split (pending decision)

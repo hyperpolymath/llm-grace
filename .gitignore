@@ -1,0 +1,139 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# RSR-compliant .gitignore
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+.direnv/
+
+# Agent & editor scaffolding (standards#68) — local-only, never committed
+# estate-wide. Owner decision 2026-05-16: gitignore both rather than commit
+# per-repo agent/editor config.
+.editorconfig
+.claude/
+
+# Build
+/target/
+/_build/
+/dist/
+/out/
+
+# Dependencies
+/node_modules/
+/vendor/
+/deps/
+/.elixir_ls/
+# npm-avoidant (standards#67): estate JS-runtime policy is Deno>Bun>pnpm>npm.
+# npm lockfiles must never be committed estate-wide.
+package-lock.json
+**/package-lock.json
+
+# Rust
+# Cargo.lock  # Keep for binaries
+
+# Elixir
+/cover/
+/doc/
+*.ez
+erl_crash.dump
+
+# Julia
+*.jl.cov
+*.jl.mem
+/Manifest.toml
+
+# ReScript / OCaml generated build artefacts
+# Estate guardrail: these are *generated outputs* the estate has committed by
+# mistake. Hand-written sources are .res/.resi/.ml/.mli — never .res.js or
+# .cm* — so ignoring these cannot drop authored code.
+/lib/bs/
+/.bsb.lock
+*.res.js
+*.cmj
+*.cmi
+*.cmt
+*.cmti
+
+# Python (SaltStack only)
+__pycache__/
+*.py[cod]
+.venv/
+
+# Ada/SPARK
+*.ali
+/obj/
+/bin/
+
+# Nix
+# flake.lock is ignored in the template repo because each project should
+# generate its own lock file on first use. In derived projects, REMOVE this
+# line and track flake.lock for reproducible builds.
+flake.lock
+
+# Haskell
+/.stack-work/
+/dist-newstyle/
+
+# Chapel
+*.chpl.tmp.*
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Test/Coverage
+/coverage/
+htmlcov/
+
+# Logs
+*.log
+/logs/
+
+# Maintenance local artifacts
+.maintenance-perms-state.tsv
+docs/reports/maintenance/*.json
+
+# Machine-readable locks
+.machine_readable/.locks/
+
+# Temp
+/tmp/
+*.tmp
+*.bak
+
+# Crash recovery artifacts
+ai-cli-crash-capture/
+
+# KDE metadata
+.directory
+
+# Sync artifacts
+sync_report*.txt
+
+# Hypatia scan cache (local-only)
+.hypatia/
+.zig-cache/
+target/
+node_modules/
+_build/
+deps/
+.elixir_ls/
+.cache/
+build/
+dist/
+
+# /build/ is a tracked config directory (build orchestration: contractile.just,
+# flake.nix, just/*.just, etc.) introduced in chore/root-cleanup. Whitelist
+# root-level /build/ so its contents are tracked. The blanket `build/` rule
+# above still ignores any nested `build/` directories (e.g. Rust crate
+# target/build/) — only the root-level path is exempt.
+!/build/
+!/build/**

@@ -1,0 +1,29 @@
+# Canonical identifier allowlist for the RSR template.
+#
+# scripts/check-no-project-identifiers.sh fails if any estate project /
+# language slug (pseudoscript, affinescript, rattlescript, ephapax,
+# katagoria, typell, nextgen-typing, the-nash-equilibrium) appears in a
+# tracked file — UNLESS the occurrence is allowlisted here.
+#
+# The only legitimate occurrences in a *neutral* template are the
+# estate-wide TypeScript->AffineScript replacement policy. Each row below
+# exempts the literal token `AffineScript` in one policy file. A hit is
+# exempt only if, after removing the allowlisted needle, the line no longer
+# contains any blocklisted slug — so e.g. sneaking `pseudoscript` onto an
+# allowlisted line still fails.
+#
+# Anything not covered here is drift: either it is project pollution (the
+# regression #45 guards against — remove it) or it is a new deliberate
+# policy reference (add a justified row here).
+#
+# Used by: scripts/check-no-project-identifiers.sh
+# Format: <tracked-path><TAB><needle>   ('#' comments; blank lines ignored)
+#         needle '*' exempts the whole file.
+
+.github/copilot-instructions.md	AffineScript
+.github/workflows/rsr-antipattern.yml	AffineScript
+.github/workflows/ts-blocker.yml	AffineScript
+.machine_readable/ai/.clinerules	AffineScript
+.machine_readable/ai/.cursorrules	AffineScript
+.machine_readable/ai/.windsurfrules	AffineScript
+docs/RSR_OUTLINE.adoc	AffineScript

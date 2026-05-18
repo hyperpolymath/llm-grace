@@ -1,0 +1,80 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: {{CURRENT_YEAR}} {{AUTHOR}} ({{OWNER}})
+= {{PROJECT_NAME}}
+:toc:
+:toc-placement: preamble
+
+image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=opensourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://{{FORGE}}/{{OWNER}}/{{REPO}}"]
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+image:https://api.thegreenwebfoundation.org/greencheckimage/{{FORGE}}[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url={{FORGE}}"]
+
+{{ONE_PARAGRAPH_PURPOSE}}
+
+[NOTE]
+====
+This repository was created from
+https://github.com/hyperpolymath/rsr-template-repo[rsr-template-repo],
+the neutral RSR (Rhodium Standard Repository) skeleton. Before first use,
+replace every `{{PLACEHOLDER}}` marker with project-specific values:
+
+[source,bash]
+----
+just init        # interactive bootstrap — prompts, replaces, validates
+----
+
+See link:.machine_readable/ai/PLACEHOLDERS.adoc[PLACEHOLDERS.adoc] for the
+full placeholder registry, and delete this NOTE block once `just init`
+has been run.
+====
+
+---
+
+== What it is
+
+{{PROJECT_DESCRIPTION}}
+
+// Describe the project: what problem it solves, who it is for, and the
+// one capability that makes it worth using ({{PROJECT_UNIQUE_STRENGTH}}).
+
+== Getting started
+
+=== Prerequisites
+
+// List language toolchains and the task runner. The RSR scaffold assumes
+// https://just.systems/[just] (task runner) and a Nix/Guix or devcontainer
+// environment; add project-specific prerequisites here.
+
+=== Install from source
+
+[source,bash]
+----
+git clone https://{{FORGE}}/{{OWNER}}/{{REPO}}
+cd {{REPO}}
+just bootstrap
+----
+
+=== Usage
+
+// Show the minimal end-to-end example for {{PROJECT_NAME}}.
+
+== AI installation
+
+[TODO-AI-INSTALL]
+
+// This marker is required by docs/AI_INSTALLATION_GUIDE.adoc and is checked
+// by `just validate-ai-install`. Replace it with the project-specific AI
+// installation section before release.
+
+== Contributing
+
+See link:.github/CONTRIBUTING.md[CONTRIBUTING] and
+link:.github/CODE_OF_CONDUCT.md[CODE_OF_CONDUCT].
+
+== Security
+
+See link:.github/SECURITY.md[SECURITY] and
+link:.well-known/security.txt[.well-known/security.txt] (RFC 9116).
+
+== License
+
+PMPL-1.0-or-later.  See link:LICENSE[LICENSE].
