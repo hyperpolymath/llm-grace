@@ -9,7 +9,7 @@
 | link:0001-adopt-rsr-standard.adoc[0001] | Adopt the RSR standard | Accepted
 | link:0002-estate-tech-debt-compounding-fixes.adoc[0002] | Estate tech-debt compounding fixes | Accepted
 | link:0003-graceful-degradation-architecture.adoc[0003] | Graceful-degradation architecture (full design) | Accepted
-| link:0004-attention-decay-vs-persist.adoc[0004] | Attention model — decay vs. persist | *PENDING*
+| link:0004-attention-decay-vs-persist.adoc[0004] | Attention model — persist, motion-gated, no timer | Accepted
 | link:0005-licensing-mpl-now-pmpl-overlay-later.adoc[0005] | Licensing posture + recorded licensing debt | Accepted
 |===
 

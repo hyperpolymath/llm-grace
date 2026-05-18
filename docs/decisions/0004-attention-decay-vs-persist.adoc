@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MPL-2.0
 // SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
 = ADR-0004: Attention model — decay vs. persist
-:status: PENDING
+:status: ACCEPTED
 
 == Status
 
-*PENDING* — seeded at the documented default; not yet ratified.
+*ACCEPTED* — ratified 2026-05-18: persist, motion-gated, no timer.
 
 == Context
 
@@ -19,9 +19,15 @@ Open question: should "attention" *decay* when the user walks away
 (after N minutes idle the drum loses its protected status), or
 *persist* until the user submits a prompt in a different terminal?
 
-== Decision (provisional default)
+== Decision
 
-*PERSIST.* A session the user set working stays the drum even if the
+*PERSIST, motion-gated, no timer.* No decay timer is introduced; the
+"decay" that is actually needed is supplied for free by the drum being
+defined as heavy *and moving* (ADR-0003) — an abandoned terminal that
+goes stale stops being the drum because it is no longer moving, not
+because a timer fired. Determinism + legibility + zero tuning.
+
+A session the user set working stays the drum even if the
 user steps away, until the user explicitly shifts attention by
 prompting in another terminal. Rationale: a long-running job the user
 launched and walked away from is exactly the work most worth
@@ -40,5 +46,8 @@ protecting; decaying its protection mid-run would punish the common
 
 == Resolution
 
-Unresolved. To be ratified or flipped before the test-first build
-graduates to global scope.
+RATIFIED 2026-05-18 (persist, motion-gated, no timer). The only
+residual is an *acceptance test*, not a decision: confirm under the
+test-first harness that the ADR-0003 motion classifier genuinely
+demotes an abandoned-but-stalled drum (so persist never latches dead
+work). Tracked as reframed sub-issue #8.
