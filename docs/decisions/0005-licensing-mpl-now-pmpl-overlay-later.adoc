@@ -1,64 +1,66 @@
 // SPDX-License-Identifier: MPL-2.0
 // SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
-= ADR-0005: Licensing posture (MPL-2.0 now; PMPL overlay later) + licensing debt
-:status: ACCEPTED (with recorded debt)
+= ADR-0005: llm-grace is a deliberate MPL-2.0 exception
+:status: ACCEPTED
+
+[NOTE]
+====
+Filename retains its original slug for link stability. Earlier
+revisions of this ADR asserted a false premise ("estate default =
+MPL-2.0; PMPL headers = relicensing debt"). That was wrong and is
+corrected here. Canonical policy: `hyperpolymath/standards`
+`LICENCE-POLICY.adoc`.
+====
 
 == Status
 
-*ACCEPTED.* Operative licence is MPL-2.0. Two items of licensing debt
-recorded and tracked.
+*ACCEPTED* — owner-ruled 2026-05-18. `llm-grace` declares `MPL-2.0`.
 
 == Context
 
-Scaffolded from `rsr-template-repo`, whose default SPDX is
-`PMPL-1.0-or-later` (Palimpsest). Estate licensing rule (owner
-Jonathan Jewell):
+Estate canonical licence is **`PMPL-1.0-or-later`** — the disciplined
+estate standard. `PMPL` = *Palimpsest-MPL v1.0* (published in
+`hyperpolymath/palimpsest-license`); its text incorporates MPL-2.0 by
+reference, and **MPL-2.0 is its automatic operative legal fallback**
+(lawyer-backed). There is no estate-wide "PMPL→MPL relicensing debt":
+`PMPL-1.0-or-later` *already is* "MPL-2.0 + Palimpsest overlay".
 
-* Estate canonical default is *PMPL-1.0-or-later* (= Palimpsest-MPL;
-  MPL-2.0 is its automatic legal fallback). `llm-grace` is a
-  *deliberate owner-ruled MPL-2.0 exception* (not estate drift).
-* `007` is excluded (expressly-stated separate licence).
-* Anything the owner's son owns, or is repo-admin for, is
-  *AGPL-3.0-or-later*.
+Carve-outs: son's co-developed work → `AGPL-3.0-or-later`; `007` →
+out of scope entirely (full commercial dual-use, hazardous to
+declare). Third-party SPDX is never rewritten.
 
-`llm-grace` is owner-owned, not `007`, not son-owned -> *MPL-2.0*.
-
-PMPL is *not* legally effective standalone: until the governing
-council and an established legal code exist, a bare PMPL claim has no
-force and falls immediately. PMPL is only ever a *future overlay on
-top of* MPL-2.0 — never a replacement, never a present standalone
-claim.
+This repo was scaffolded from `rsr-template-repo` (canonical default
+`PMPL-1.0-or-later`).
 
 == Decision
 
-. Operative licence: *MPL-2.0*. `LICENSE` holds canonical MPL-2.0 text.
-. New project files carry `SPDX-License-Identifier: MPL-2.0`.
-. No standalone PMPL claim anywhere.
+`llm-grace` deliberately declares **`MPL-2.0`** — a documented,
+owner-ruled standalone exception, not drift. This is *consistent* with
+the estate model: MPL-2.0 is precisely PMPL's legal base, so an
+MPL-2.0 repo is a clean subset, never a contradiction. New project
+files carry `SPDX-License-Identifier: MPL-2.0`; `LICENSE` holds
+canonical MPL-2.0 text. No standalone PMPL claim is made.
 
-== Licensing debt (recorded, tracked)
+== No licensing debt
 
-* *Debt 1 — relicense (MANUAL ONLY)*: ~199 template files still carry
-  `PMPL-1.0-or-later`. Corrected *by the owner, file-by-file, over
-  time*. NO automated or bulk sweep, ever (see hard constraint below).
-  The `just init` placeholder bootstrap is separate ordinary
-  scaffolding and may be done normally; the SPDX relicensing is not.
-* *Debt 2 — PMPL overlay migration*: when the council + established
-  legal code exist, deliberately move to "MPL-2.0 with PMPL overlay".
-  Gated on that external precondition; tracked, not actioned now.
+The earlier "Debt 1: relicense ~199 template files" and "Debt 2: PMPL
+overlay migration" were artefacts of the false premise and are
+withdrawn. `PMPL-1.0-or-later` headers elsewhere are correct, not
+debt. The only estate-wide licence debt (tracked in `standards`) is
+manual normalisation of *malformed variants* (`PMPL-1.0`,
+`PMPL-1.0-or-later-or-later`) — which does not affect this repo.
 
 == Hard constraint: licence edits are manual, owner-only
 
-Never automate or bulk-edit licence / SPDX headers in this repo. Every
-prior automated attempt across the estate scrambled identifiers and —
-critically — rewrote third-party / component licence headers, falsely
-attributing other people's licence changes to the owner. Relicensing
-is manual, file-by-file, owner-driven. Agents may author *new* files
-with correct SPDX and may set this repo's own top-level `LICENSE`, but
-must never sweep existing or third-party headers. The relicense debt
-is a tracked *manual ledger*, not an automatable task.
+Never automate or bulk-edit licence / SPDX headers. Prior automated
+attempts across the estate scrambled identifiers and rewrote
+third-party headers, falsely attributing others' licence changes to
+the owner. Relicensing is manual, file-by-file, owner-driven. Agents
+may author *new* files with correct SPDX and may set a brand-new
+repo's own `LICENSE` — that is authoring, not relicensing.
 
 == Consequences
 
-Honest, legally-real licence today; aspirational PMPL future is
-documented as debt, not silently asserted. Cleanup integrity preserved
-by forbidding automation.
+`llm-grace` is honestly and finally `MPL-2.0`. The estate constitution
+is unaffected by this repo's choice (it is an explicit exception). No
+false debt is asserted; the no-automation guarantee stands.
