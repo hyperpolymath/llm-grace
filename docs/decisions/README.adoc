@@ -10,9 +10,10 @@
 | link:0002-estate-tech-debt-compounding-fixes.adoc[0002] | Estate tech-debt compounding fixes | Accepted
 | link:0003-graceful-degradation-architecture.adoc[0003] | Graceful-degradation architecture (full design) | Accepted
 | link:0004-attention-decay-vs-persist.adoc[0004] | Attention model — persist, motion-gated, no timer | Accepted
-| link:0005-licensing-mpl-now-pmpl-overlay-later.adoc[0005] | Licensing posture + recorded licensing debt | Accepted
+| link:0005-licensing-mpl-now-pmpl-overlay-later.adoc[0005] | llm-grace is a deliberate MPL-2.0 exception | Accepted
 |===
 
 ADR-0003 is the load-bearing design (the desktop design doc, verbatim).
-ADR-0004 is the single open dial. ADR-0005 records the MPL-2.0 posture
-and the tracked licensing debt.
+ADR-0004 is ratified (persist, motion-gated, no timer). ADR-0005
+records that llm-grace is a deliberate MPL-2.0 exception (no licensing
+debt — that framing was a corrected false premise).

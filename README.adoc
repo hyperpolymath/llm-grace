@@ -58,31 +58,17 @@ First adapter targets Claude Code hooks (`PreToolUse`,
 It will be built *test-first* against a controlled memory balloon in an
 isolated session before anything goes global.
 
-== Licence + recorded licensing debt
+== Licence
 
-Operative licence: *MPL-2.0* (see link:LICENSE[LICENSE]) — real,
-established, and legally effective today.
+*MPL-2.0* (see link:LICENSE[LICENSE]) — legally effective today.
 
-PMPL (Palimpsest) is *not* claimed standalone. Until the governing
-council and an established legal code exist, a bare PMPL claim has no
-force and would fall immediately. PMPL is therefore only ever intended
-as a *future overlay on top of MPL-2.0*, not a replacement and not a
-present claim.
-
-This is explicit *licensing debt*:
-
-* The repo was scaffolded from
-  https://github.com/hyperpolymath/rsr-template-repo[rsr-template-repo],
-  whose default is `PMPL-1.0-or-later`. ~199 files still carry that
-  SPDX header.
-* Debt 1 — *relicense sweep*: replace all template `PMPL-1.0-or-later`
-  SPDX headers with `MPL-2.0`; complete the RSR `just init` placeholder
-  bootstrap. (Tracked sub-issue, not half-applied.)
-* Debt 2 — *PMPL-overlay migration*: when the council + legal code are
-  established, move to "MPL-2.0 with PMPL overlay" deliberately and
-  correctly. (Tracked, gated on that external precondition.)
-
-See link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005].
+This is a *deliberate, owner-ruled standalone exception* to the estate
+canonical `PMPL-1.0-or-later`, not drift. It is consistent with the
+estate model: `PMPL-1.0-or-later` (= Palimpsest-MPL) has MPL-2.0 as
+its automatic legal base, so an MPL-2.0 repo is a clean subset. There
+is *no* "PMPL relicensing debt" — that framing was a corrected false
+premise. Canonical policy: `hyperpolymath/standards` `LICENCE-POLICY.adoc`.
+Rationale: link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005].
 
 == Provenance / housekeeping
 
