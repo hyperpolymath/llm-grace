@@ -50,6 +50,54 @@ pub const Snapshot = struct {
     gpu_util_pct: ?u8,
 };
 
+/// Session-local attention/motion signals from ADR-0003/ADR-0004.
+/// This is separate from machine pressure: it decides whether the
+/// persisted attention target is still eligible to be the protected drum.
+pub const SessionSignals = struct {
+    /// True when this session is the last UserPromptSubmit target. ADR-0004
+    /// says this attention marker persists; it does not decay by timer.
+    attention_persisted: bool,
+    /// True when RSS/working set puts this session in the "heavy" row.
+    heavy_rss: bool,
+    /// True when passive transcript observation shows progress.
+    transcript_advanced: bool,
+    /// CPU-active override from ADR-0003: a hot child still counts as moving
+    /// even if the transcript is briefly quiet.
+    cpu_active: bool = false,
+};
+
+pub const SessionClass = enum {
+    /// Last-attention target is heavy and moving: protect it last.
+    protected_drum,
+    /// Heavy but not moving: pause/checkpoint first; never protected by size.
+    heat_no_motion,
+    /// Heavy and moving, but not the persisted attention target.
+    heavy_moving_unfocused,
+    /// Light work that is still making progress.
+    light_moving,
+    /// Light and stalled/quiet: cheapest pause target.
+    idle_waiting,
+};
+
+pub fn sessionMoving(s: SessionSignals) bool {
+    return s.transcript_advanced or s.cpu_active;
+}
+
+pub fn classifySession(s: SessionSignals) SessionClass {
+    const moving = sessionMoving(s);
+    if (s.heavy_rss) {
+        if (!moving) return .heat_no_motion;
+        if (s.attention_persisted) return .protected_drum;
+        return .heavy_moving_unfocused;
+    }
+    if (moving) return .light_moving;
+    return .idle_waiting;
+}
+
+pub fn protectsPersistedDrum(s: SessionSignals) bool {
+    return classifySession(s) == .protected_drum;
+}
+
 // Named, visible thresholds (legibility > magic numbers).
 const MEM_CLIFF_FRAC_NUM = 1; // MemAvailable < 10% of total => cliff
 const MEM_CLIFF_FRAC_DEN = 10;
@@ -209,4 +257,25 @@ test "scenario table: classifier matches the spec" {
             return e;
         };
     }
+}
+
+test "ADR-0004: persisted attention does not protect a heavy stalled drum" {
+    const abandoned = SessionSignals{
+        .attention_persisted = true,
+        .heavy_rss = true,
+        .transcript_advanced = false,
+        .cpu_active = false,
+    };
+
+    try std.testing.expect(!sessionMoving(abandoned));
+    try std.testing.expectEqual(SessionClass.heat_no_motion, classifySession(abandoned));
+    try std.testing.expect(!protectsPersistedDrum(abandoned));
+
+    const still_working = SessionSignals{
+        .attention_persisted = true,
+        .heavy_rss = true,
+        .transcript_advanced = true,
+    };
+    try std.testing.expectEqual(SessionClass.protected_drum, classifySession(still_working));
+    try std.testing.expect(protectsPersistedDrum(still_working));
 }
