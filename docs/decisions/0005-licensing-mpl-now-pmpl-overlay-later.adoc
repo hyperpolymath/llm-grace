@@ -14,7 +14,9 @@ Scaffolded from `rsr-template-repo`, whose default SPDX is
 `PMPL-1.0-or-later` (Palimpsest). Estate licensing rule (owner
 Jonathan Jewell):
 
-* Default: anything the owner owns is *MPL-2.0* unless expressly stated.
+* Estate canonical default is *PMPL-1.0-or-later* (= Palimpsest-MPL;
+  MPL-2.0 is its automatic legal fallback). `llm-grace` is a
+  *deliberate owner-ruled MPL-2.0 exception* (not estate drift).
 * `007` is excluded (expressly-stated separate licence).
 * Anything the owner's son owns, or is repo-admin for, is
   *AGPL-3.0-or-later*.
