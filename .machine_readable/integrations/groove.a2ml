@@ -1,4 +1,4 @@
-; SPDX-License-Identifier: PMPL-1.0-or-later
+; SPDX-License-Identifier: MPL-2.0
 ; Groove Protocol Manifest — declares API surfaces this project exposes.
 ;
 ; Consumed by the Groove bridge / zig-unified-api-adapter for snap-on/snap-off
