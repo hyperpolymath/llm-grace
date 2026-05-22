@@ -67,5 +67,5 @@
   (synopsis "Graceful degradation for concurrent LLM/agent terminals: cheap signature-based load-shedding with a crash-safe ledger and legible post-mortems")
   (description "RSR-compliant project. See README.adoc for details.")
   (license (list
-            ;; PMPL-1.0-or-later extends MPL-2.0
+            ;; MPL-2.0 extends MPL-2.0
             mpl2.0)))

@@ -80,10 +80,10 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 #
 # Enforcement: `scripts/check-no-md-in-docs.sh` (fails if any *.md under docs/).
 
-# === Banned: V-language ===
+# === Banned: ziguage ===
 # V (vlang.io) is banned estate-wide. Replaced by `zig-unified-api-adapter`
 # (16 endpoints + transaction-based firewall gating). Do not introduce
-# V-lang code, scaffolders, or references. Note that Coq theorem files use
+# zig code, scaffolders, or references. Note that Coq theorem files use
 # the same `.v` extension and are unaffected — the rule looks at content
 # patterns, not the extension.
 #
@@ -100,7 +100,7 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 #   build/just/validate.just   validate-rsr/state/ai-install + aggregate
 #   build/just/proofs.just     proof-check-{all,idris2,lean4,agda,coq},
 #                              proof-scan-dangerous, proof-status
-#   build/just/groove.just     Groove protocol setup (after V-lang removed)
+#   build/just/groove.just     Groove protocol setup (after zig removed)
 #
 # Daily-use recipes (BUILD, TEST, LINT, RUN, DEPS, DOCS, CONTAINER, CI,
 # SECURITY, STATE, GUIX/NIX, MATRIX, VERSION CONTROL, UTILITIES, SESSION)
@@ -113,7 +113,7 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 # 1. chore/root-cleanup       Relocate root sprawl per root-allow.txt; add
 #                             scripts/check-root-shape.sh; remove stub
 #                             health files shadowed by .github/ versions.
-# 2. chore/remove-v-lang      Purge V-lang remnants (gen-v-connector recipe,
+# 2. chore/remove-zig      Purge zig remnants (gen-v-connector recipe,
 #                             "V-TRIPLE" section header, "V-triple
 #                             connectors" comment in groove.a2ml).
 # 3. chore/md-to-adoc         Port general docs in docs/ from .md to .adoc;
@@ -127,11 +127,11 @@ enforcement-workflow = ".github/workflows/estate-rules.yml"
 # === Reference scripts ===
 # scripts/check-root-shape.sh      Root allowlist validator
 # scripts/check-no-md-in-docs.sh   AsciiDoc-by-default validator
-# scripts/check-no-vlang.sh        V-lang ban validator
+# scripts/check-no-vlang.sh        zig ban validator
 # scripts/validate-template.sh     Aggregate RSR compliance (workflows, SPDX, etc.)
 
 # === Reference memory entries (for AI agents) ===
 # feedback_adoc_default_md_for_githealth   AsciiDoc-by-default rule
-# feedback_v_lang_banned                   V-lang ban
-# project_zig_unified_api                  Replacement for v-triple/V-lang
+# feedback_v_lang_banned                   zig ban
+# project_zig_unified_api                  Replacement for v-triple/zig
 # feedback_gh_workflow_scope               OAuth scope for workflow files

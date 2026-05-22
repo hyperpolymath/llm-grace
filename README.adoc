@@ -63,8 +63,8 @@ isolated session before anything goes global.
 *MPL-2.0* (see link:LICENSE[LICENSE]) — legally effective today.
 
 This is a *deliberate, owner-ruled standalone exception* to the estate
-canonical `PMPL-1.0-or-later`, not drift. It is consistent with the
-estate model: `PMPL-1.0-or-later` (= Palimpsest-MPL) has MPL-2.0 as
+canonical `MPL-2.0`, not drift. It is consistent with the
+estate model: `MPL-2.0` (= Palimpsest-MPL) has MPL-2.0 as
 its automatic legal base, so an MPL-2.0 repo is a clean subset. There
 is *no* "PMPL relicensing debt" — that framing was a corrected false
 premise. Canonical policy: `hyperpolymath/standards` `LICENCE-POLICY.adoc`.
