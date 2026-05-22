@@ -52,7 +52,7 @@ The compounding fixes (status as of 2026-05-17):
   Actions cost bleed fixed at source.
 | ✅ MERGED (Day 2)
 
-| V-lang source removal + consumer sweep
+| zig source removal + consumer sweep
 | The banned-runtime class estate-wide (18-repo sweep: 16 merged, 2 guard
   no-ops). Audit found a residual cluster → Item 7c finalisation, gating the
   Day-25 "classes closed" checkpoint.
@@ -88,7 +88,7 @@ Operating rules that proved correct and are now estate policy:
 - **Scope policy must be locked in writing before a bulk sweep runs.** e.g.
   the ReScript sweep preserves `rescript`-named paths and adapters untouched;
   only "use ReScript instead" *guidance* is rewritten. Recorded in the
-  `reference_rescript_ecosystem_policy` memory; V-lang equivalent in
+  `reference_rescript_ecosystem_policy` memory; zig equivalent in
   `reference_vlang_ecosystem_policy`.
 - **Destructive items (git history rewrite + force-push) always require
   explicit per-repo confirmation**, even on their scheduled day.
@@ -134,7 +134,7 @@ To be applied to `rsr-template-repo` so the debt classes cannot re-accumulate
 - [x] Clippy panic-gate (warn; ratchet to deny once estate is green — Item 12)
 - [x] Artefact `.gitignore` / `.gitattributes` (no committed build output)
 - [x] "AffineScript, not ReScript" guidance wording in scaffold docs
-- [ ] V-lang permitted *only* when it is Coq; no V-stub-generation recipes in
+- [ ] zig permitted *only* when it is Coq; no V-stub-generation recipes in
       template Justfile/Containerfile/flake (Item 7d)
 - [ ] Interface-safety law in scaffold docs: ABI=Idris2 / API+FFI=Zig; every
       boundary gets an Idris2 contract + Zig transaction layer

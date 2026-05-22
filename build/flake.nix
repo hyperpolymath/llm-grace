@@ -160,7 +160,7 @@
           meta = with pkgs.lib; {
             description = "Graceful degradation for concurrent LLM/agent terminals";
             homepage = "https://github.com/hyperpolymath/llm-grace";
-            license = licenses.mpl20; # PMPL-1.0-or-later extends MPL-2.0
+            license = licenses.mpl20; # MPL-2.0 extends MPL-2.0
             maintainers = [];
             platforms = [ "x86_64-linux" "aarch64-linux" ];
           };

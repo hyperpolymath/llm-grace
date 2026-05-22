@@ -18,19 +18,19 @@ corrected here. Canonical policy: `hyperpolymath/standards`
 
 == Context
 
-Estate canonical licence is **`PMPL-1.0-or-later`** — the disciplined
+Estate canonical licence is **`MPL-2.0`** — the disciplined
 estate standard. `PMPL` = *Palimpsest-MPL v1.0* (published in
 `hyperpolymath/palimpsest-license`); its text incorporates MPL-2.0 by
 reference, and **MPL-2.0 is its automatic operative legal fallback**
 (lawyer-backed). There is no estate-wide "PMPL→MPL relicensing debt":
-`PMPL-1.0-or-later` *already is* "MPL-2.0 + Palimpsest overlay".
+`MPL-2.0` *already is* "MPL-2.0 + Palimpsest overlay".
 
 Carve-outs: son's co-developed work → `AGPL-3.0-or-later`; `007` →
 out of scope entirely (full commercial dual-use, hazardous to
 declare). Third-party SPDX is never rewritten.
 
 This repo was scaffolded from `rsr-template-repo` (canonical default
-`PMPL-1.0-or-later`).
+`MPL-2.0`).
 
 == Decision
 
@@ -45,10 +45,10 @@ canonical MPL-2.0 text. No standalone PMPL claim is made.
 
 The earlier "Debt 1: relicense ~199 template files" and "Debt 2: PMPL
 overlay migration" were artefacts of the false premise and are
-withdrawn. `PMPL-1.0-or-later` headers elsewhere are correct, not
+withdrawn. `MPL-2.0` headers elsewhere are correct, not
 debt. The only estate-wide licence debt (tracked in `standards`) is
 manual normalisation of *malformed variants* (`PMPL-1.0`,
-`PMPL-1.0-or-later-or-later`) — which does not affect this repo.
+`MPL-2.0-or-later`) — which does not affect this repo.
 
 == Hard constraint: licence edits are manual, owner-only
 

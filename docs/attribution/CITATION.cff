@@ -9,7 +9,7 @@ version: 0.1.0
 date-released: 2026-05-18
 url: "https://github.com/hyperpolymath/llm-grace"
 repository-code: "https://github.com/hyperpolymath/llm-grace"
-license: PMPL-1.0-or-later
+license: MPL-2.0
 keywords:
   - "rsr"
   - "formal-verification"

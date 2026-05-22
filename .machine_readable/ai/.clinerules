@@ -5,7 +5,7 @@
 # STARTUP: Read .machine_readable/STATE.a2ml first for canonical file locations.
 
 # LICENSE
-# All original code: PMPL-1.0-or-later.
+# All original code: MPL-2.0.
 # Never AGPL-3.0. MPL-2.0 only as platform-required fallback.
 # SPDX header required on every source file.
 # Copyright: Jonathan Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>

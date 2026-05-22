@@ -40,7 +40,7 @@ K9!
       organization = "hyperpolymath",
     },
 
-    license = "PMPL-1.0-or-later",
+    license = "MPL-2.0",
 
     keywords = [
       "rhodium-standard",
