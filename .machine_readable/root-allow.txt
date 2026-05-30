@@ -25,6 +25,7 @@ llm-warmup-dev.adoc        # LLM onboarding warm-up (developer); estate-standard
 llm-warmup-user.adoc       # LLM onboarding warm-up (user); estate-standard root doc
 0-AI-MANIFEST.a2ml         # thin pointer to .machine_readable/0.1-AI-MANIFEST.a2ml
 LICENSE
+REUSE.toml                 # REUSE-spec bulk licensing declaration (owner-authored files)
 CHANGELOG.md
 
 # ─── Build entry points (must live at root for their tooling) ────────────────
