@@ -1,0 +1,106 @@
+# SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+# SPDX-License-Identifier: MPL-2.0
+#
+# ───────────────────────────────────────────────────────────────────────────
+# DRAFT — bulk licensing declaration for llm-grace, FOR OWNER REVIEW.
+# ───────────────────────────────────────────────────────────────────────────
+#
+# Context: ADR-0005 and issue #2 reserve per-file SPDX as MANUAL, owner-only
+# work ("no agent pass — ever"). At the owner's explicit request, this file
+# declares licensing for owner-authored files *via REUSE.toml* — it edits NO
+# existing file headers. Review the scoping below before merging; adjust the
+# copyright string / globs as you see fit.
+#
+# Everything declared here is MPL-2.0 + owner copyright. Files that already
+# carry their own SPDX header keep it (REUSE aggregates; an identical MPL-2.0
+# declaration is a no-op). The globs are deliberately written so that the one
+# non-MPL file in the repo is NEVER matched — see CARVE-OUTS at the bottom.
+#
+# CARVE-OUTS (intentionally NOT declared here):
+#   * .github/workflows/k9iser-regen.yml — licensed AGPL-3.0-or-later (son's
+#     co-developed work, per ADR-0005). Its copyright attribution is the
+#     owner's to set, not an agent's; left for manual annotation. It is not
+#     matched by any rule below (no `**/*.yml`, no `.github/**`).
+#   * src/interface/build/ttc/** — generated Idris2 build artifacts. They are
+#     covered as MPL-derived below, but ideally should be git-ignored and
+#     removed from version control rather than licensed.
+
+version = 1
+
+# 1) Owner-authored content across the standard project trees (recursive).
+#    None of these trees contain the AGPL carve-out.
+[[annotations]]
+path = [
+  "docs/**",
+  ".machine_readable/**",
+  "src/**",
+  "verification/**",
+  "container/**",
+  "features/**",
+  "session/**",
+  ".well-known/**",
+  "examples/**",
+  "build/**",
+  "tools/**",
+  "scripts/**",
+  ".devcontainer/**",
+  ".github/ISSUE_TEMPLATE/**",
+  ".github/DISCUSSION_TEMPLATE/**",
+]
+SPDX-FileCopyrightText = "2026 Jonathan D.A. Jewell (hyperpolymath)"
+SPDX-License-Identifier = "MPL-2.0"
+
+# 2) Owner-authored files at the repo root and directly under .github/, plus
+#    the MPL CI workflows. Listed EXPLICITLY (not globbed) so that the AGPL
+#    carve-out `.github/workflows/k9iser-regen.yml` is conspicuously absent
+#    and can never be swept in.
+[[annotations]]
+path = [
+  # repo root
+  ".editorconfig",
+  ".envrc",
+  ".gitattributes",
+  ".gitignore",
+  ".gitlab-ci.yml",
+  ".pre-commit-config.yaml",
+  ".tool-versions",
+  "CHANGELOG.md",
+  "CONTRIBUTING.md",
+  "EXPLAINME.adoc",
+  "PROOF-NEEDS.adoc",
+  "PROOF-STATUS.adoc",
+  "SECURITY.md",
+  "SKELETON.adoc",
+  "TEST-NEEDS.adoc",
+  "TOPOLOGY.adoc",
+  "coordination.k9",
+  # files directly under .github/
+  ".github/.mailmap",
+  ".github/CODE_OF_CONDUCT.md",
+  ".github/CONTRIBUTING.md",
+  ".github/DIRECTORY.adoc",
+  ".github/SECURITY.md",
+  ".github/SUPPORT",
+  ".github/CODEOWNERS",
+  ".github/MAINTAINERS",
+  ".github/pull_request_template.md",
+  ".github/FUNDING.yml",
+  ".github/dependabot.yml",
+  ".github/settings.yml",
+  # MPL CI workflows (k9iser-regen.yml deliberately excluded — AGPL)
+  ".github/workflows/boj-build.yml",
+  ".github/workflows/codeql.yml",
+  ".github/workflows/dependabot-automerge.yml",
+  ".github/workflows/governance.yml",
+  ".github/workflows/hypatia-scan.yml",
+  ".github/workflows/instant-sync.yml",
+  ".github/workflows/openssf-compliance.yml",
+  ".github/workflows/rhodibot.yml",
+  ".github/workflows/scorecard-enforcer.yml",
+  ".github/workflows/scorecard.yml",
+  ".github/workflows/secret-scanner.yml",
+  ".github/workflows/skeleton-drift.yml",
+  ".github/workflows/static-analysis-gate.yml",
+]
+SPDX-FileCopyrightText = "2026 Jonathan D.A. Jewell (hyperpolymath)"
+SPDX-License-Identifier = "MPL-2.0"
