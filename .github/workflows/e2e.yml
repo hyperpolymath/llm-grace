@@ -60,7 +60,7 @@ jobs:
   #   timeout-minutes: 15
   #   steps:
   #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
-  #     - uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d7b4f723a50dea1f3608  # v2
+  #     - uses: goto-bus-stop/setup-zig@abea47f85e598557f500fa1fd2ab7464fcb39406  # v2.2.1
   #       with:
   #         version: 0.15.0
   #     - run: cd ffi/zig && zig build test
@@ -73,7 +73,7 @@ jobs:
   #   timeout-minutes: 15
   #   steps:
   #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
-  #     - uses: erlef/setup-beam@5a67e1a1dd86cae5e5bef84e2da5060406a66c07  # v1
+  #     - uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93  # v1.24.0
   #       with:
   #         otp-version: '27.0'
   #         elixir-version: '1.17'
@@ -87,7 +87,7 @@ jobs:
   #   timeout-minutes: 15
   #   steps:
   #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
-  #     - uses: denoland/setup-deno@5fae568d37c3b73e0e4ca63d4e2c4e324a2b3497  # v2
+  #     - uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282  # v2.0.4
   #       with:
   #         deno-version: v2.x
   #     - run: deno install --node-modules-dir=auto
@@ -105,7 +105,7 @@ jobs:
   #       project: [chromium-1080p, firefox-1080p, webkit-1080p]
   #   steps:
   #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
-  #     - uses: denoland/setup-deno@5fae568d37c3b73e0e4ca63d4e2c4e324a2b3497  # v2
+  #     - uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282  # v2.0.4
   #       with:
   #         deno-version: v2.x
   #     - run: deno install --node-modules-dir=auto
@@ -125,7 +125,7 @@ jobs:
   #   timeout-minutes: 15
   #   steps:
   #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
-  #     - uses: haskell-actions/setup@dd344bc1cec854a9b55c2b857c28b688010e4fce  # v2
+  #     - uses: haskell-actions/setup@cd0d9bdd65b20557f41bea4dbe43d0b5fbbfe553  # v2.11.0
   #       with:
   #         ghc-version: '9.6'
   #         cabal-version: '3.10'
@@ -171,7 +171,7 @@ jobs:
   #   timeout-minutes: 15
   #   steps:
   #     - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
-  #     - uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d7b4f723a50dea1f3608  # v2
+  #     - uses: goto-bus-stop/setup-zig@abea47f85e598557f500fa1fd2ab7464fcb39406  # v2.2.1
   #       with:
   #         version: 0.15.0
   #     - run: cd ffi/zig && zig build bench
