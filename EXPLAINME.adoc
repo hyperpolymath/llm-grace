@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-= RSR Template Repo - Explainme
+= llm-grace — Explainme
 :toc:
 :icons: font
 
