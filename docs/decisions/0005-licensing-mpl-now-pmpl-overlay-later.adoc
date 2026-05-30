@@ -34,12 +34,16 @@ This repo was scaffolded from `rsr-template-repo` (canonical default
 
 == Decision
 
+// REUSE-IgnoreStart
+
 `llm-grace` deliberately declares **`MPL-2.0`** — a documented,
 owner-ruled standalone exception, not drift. This is *consistent* with
 the estate model: MPL-2.0 is precisely PMPL's legal base, so an
 MPL-2.0 repo is a clean subset, never a contradiction. New project
 files carry `SPDX-License-Identifier: MPL-2.0`; `LICENSE` holds
 canonical MPL-2.0 text. No standalone PMPL claim is made.
+
+// REUSE-IgnoreEnd
 
 == No licensing debt
 

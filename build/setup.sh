@@ -252,7 +252,9 @@ main() {
     # Write report
     REPORT_FILE="INSTALL-SECURITY-REPORT.adoc"
     {
+        # REUSE-IgnoreStart
         printf "// SPDX-License-Identifier: MPL-2.0\n"
+        # REUSE-IgnoreEnd
         printf "= Install Security Report\n"
         printf ":date: %s\n\n" "$(date -Iseconds 2>/dev/null || date)"
         printf "== Platform\n"
