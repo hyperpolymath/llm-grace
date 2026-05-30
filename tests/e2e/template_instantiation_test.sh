@@ -26,6 +26,10 @@ TEST_PROJECT_NAME="Test Project"
 TEST_DESCRIPTION="A test project instantiated from the RSR template"
 TEST_PRIMARY_LANGUAGE="Rust"
 
+# Exported so the `bash -c` spawned by `find -exec` (Phase 3) inherits them.
+export TEST_REPO_NAME TEST_OWNER TEST_FORGE TEST_AUTHOR TEST_AUTHOR_EMAIL \
+       TEST_PROJECT_NAME TEST_DESCRIPTION TEST_PRIMARY_LANGUAGE
+
 # ANSI colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -137,7 +141,7 @@ find "$TEST_REPO_PATH" -type f \
                 sed -i "s|$placeholder|$value|g" "$file"
             fi
         done
-    ' _ "$file"
+    ' _ {} \;
 
 log_pass "All placeholder tokens replaced"
 
