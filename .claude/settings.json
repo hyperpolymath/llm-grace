@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "Bash(reuse lint:*)",
+      "Bash(shellcheck:*)",
+      "Bash(asciidoctor:*)",
+      "Bash(bash scripts/check-*.sh:*)",
+      "Bash(just --list:*)",
+      "Bash(just doctor:*)",
+      "Bash(jq:*)"
+    ]
+  }
+}

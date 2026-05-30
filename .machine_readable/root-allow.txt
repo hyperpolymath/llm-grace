@@ -48,6 +48,7 @@ CONTRIBUTING.md
 SECURITY.md
 
 # ─── Directories ─────────────────────────────────────────────────────────────
+.claude/                   # committed Claude Code config (settings.json + hooks/)
 .devcontainer/             # VS Code dev container spec; tool-required at root
 .git/
 .github/                   # CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, workflows/

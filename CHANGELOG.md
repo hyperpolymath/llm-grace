@@ -9,3 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- Run: just changelog -->
 
 ## [Unreleased]
+
+### Added
+- `LICENSES/` directory (MPL-2.0, AGPL-3.0-or-later) and a root `REUSE.toml`
+  declaring licensing for owner-authored files. The project is now fully
+  compliant with version 3.3 of the REUSE Specification (`reuse lint` passes).
+- Claude Code project config (`.claude/settings.json`): a permission allowlist
+  for the safe git / reuse / shellcheck / estate-rules commands used to
+  validate this repo, reducing prompts in future sessions.
+
+### Changed
+- Repaired the V-language ban check in the `estate-rules` workflow: a
+  find/replace had corrupted it to match the project's core language (Zig)
+  rather than the V language, so the gate had been red since the initial
+  commit. It is now green.
+- Rewrote `docs/STATE-VISUALIZER.adoc` to reflect honest design-phase status
+  (removed the inaccurate "100% certified" and PMPL claims).
+- Replaced residual `rsr-template-repo` identity with `llm-grace` (`Justfile`,
+  `EXPLAINME.adoc`, `TEST-NEEDS.adoc`).
+- Allowlisted `SKELETON.adoc` at the repo root; converted the tech-debt audit
+  note from Markdown to AsciiDoc.
+- README / docs: withdrew the "PMPL licensing debt" framing per ADR-0005, and
+  wrapped three documentation mentions of SPDX identifiers so `reuse` no
+  longer mis-parses them as headers.
+
+### Fixed
+- Corrected a broken `find -exec` (missing `{}` and terminator) in the
+  end-to-end template-instantiation test.
+
+### Removed
+- Generated Idris2 build artifacts under `src/interface/build/` (now
+  git-ignored).
+
+### Closed
+- Issue #3 ("Licensing debt 2: PMPL-overlay migration") — withdrawn per
+  ADR-0005; closed as not planned.

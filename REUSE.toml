@@ -46,6 +46,7 @@ path = [
   ".devcontainer/**",
   ".github/ISSUE_TEMPLATE/**",
   ".github/DISCUSSION_TEMPLATE/**",
+  ".claude/**",
 ]
 SPDX-FileCopyrightText = "2026 Jonathan D.A. Jewell (hyperpolymath)"
 SPDX-License-Identifier = "MPL-2.0"
