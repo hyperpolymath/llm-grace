@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 # Triggers central K9-contract regeneration via boj-server's k9iser-mcp
 # cartridge, so generated/k9iser/*.k9 are produced centrally instead of
 # being run ad hoc and hand-committed (the drift that broke Dogfood Gate
