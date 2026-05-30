@@ -50,7 +50,7 @@ Design phase. The architecture is decided and recorded as ADRs:
 
 * link:docs/decisions/0003-graceful-degradation-architecture.adoc[ADR-0003 — full architecture]
 * link:docs/decisions/0004-attention-decay-vs-persist.adoc[ADR-0004 — attention: persist, motion-gated, no timer (ACCEPTED)]
-* link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005 — licensing posture + recorded licensing debt]
+* link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005 — licensing posture (deliberate MPL-2.0 exception; no PMPL debt)]
 
 Build is tracked as native sub-issues under the requirements epic.
 First adapter targets Claude Code hooks (`PreToolUse`,

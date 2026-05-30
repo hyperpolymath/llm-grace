@@ -2,45 +2,50 @@
 # SPDX-License-Identifier: MPL-2.0
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# check-no-vlang.sh — enforce "ziguage is banned in the estate".
+# check-no-vlang.sh — enforce "the V language (vlang.io) is banned in the estate".
 #
-# Estate rule: zig (vlang.io) is banned. The connector layer is
-# `zig-unified-api-adapter` (16 endpoints + transaction-firewall gating).
-# Treat any zig reference as drift and remove it.
+# Estate rule: the V language (vlang.io) is banned. The connector layer is
+# `v-unified-api-adapter` (16 endpoints + transaction-firewall gating).
+# Treat any V reference as drift and remove it.
 #
-# Searches for zig-specific patterns in tracked files. The .v file
+# Searches for V-specific patterns in tracked files. The .v file
 # extension is intentionally NOT used as a marker because Coq theorem files
 # share that extension; this check looks at content patterns instead.
+#
+# NOTE: this check must NEVER match the substring "zig". Zig (ziglang.org)
+# is a permitted, first-class estate language and is in fact this repo's
+# core language (see docs/decisions/0003-graceful-degradation-architecture.adoc).
+# An earlier revision was corrupted by a find/replace that turned the V
+# markers into the literal "zig", which wrongly flagged all legitimate Zig
+# source; that corruption is removed here.
 #
 # Excludes:
 #   .git/ (vcs internals)
 #   node_modules/ (vendored dependencies)
 #
 # Exit codes:
-#   0 — no zig references found
-#   1 — zig references found (treat as drift)
+#   0 — no V references found
+#   1 — V references found (treat as drift)
 #   2 — usage / setup error
 
 set -euo pipefail
 
 REPO_ROOT="${1:-.}"
 
-# Patterns that uniquely indicate zig code, scaffolding, or naming.
+# Patterns that uniquely indicate V code, scaffolding, or naming.
 # Coq's `.v` extension is not used as a marker (see header).
 PATTERNS=(
     'gen-v-connector'
     'V-TRIPLE'
     'v-triple'
-    'zig'
-    'zig'
     'vlang'
     'connectors/v-'
 )
 
 PATTERN_OR=$(IFS='|'; echo "${PATTERNS[*]}")
 
-# Files that document the zig ban itself (the rule's own description
-# legitimately names "zig", "V-TRIPLE", etc.). Excluded by name.
+# Files that document the V ban itself (the rule's own description
+# legitimately names "V", "V-TRIPLE", etc.). Excluded by name.
 DOC_EXCLUSIONS=(
     "estate-rules.yml"             # the workflow that calls this script
     "check-no-vlang.sh"            # this script itself
@@ -56,10 +61,10 @@ done
 
 # Architecture Decision Records under docs/decisions/ legitimately NAME
 # the banned tech to *record the decision about it* (e.g. "remove all
-# zig sources"). They are meta-policy prose, not template body that
+# V sources"). They are meta-policy prose, not template body that
 # clones into a downstream project, so they are exempt from the content
 # scan. Nothing executable lives in an ADR, so this cannot mask real
-# zig code. Tracked under hyperpolymath/standards#84.
+# V code. Tracked under hyperpolymath/standards#84.
 ADR_EXEMPT_RE='(^|/)docs/decisions/'
 
 # Build grep arguments. Use -r to recurse, -n for line numbers, -i for
@@ -74,15 +79,15 @@ HITS=$(grep -rni -E "$PATTERN_OR" "$REPO_ROOT" \
     || true)
 
 if [ -z "$HITS" ]; then
-    echo "PASS: no zig references"
+    echo "PASS: no V-language references"
     exit 0
 fi
 
 # Count matches
 LINES=$(echo "$HITS" | wc -l | tr -d ' ')
 
-echo "FAIL: $LINES zig reference(s) found (estate rule: ziguage is banned):" >&2
+echo "FAIL: $LINES V-language reference(s) found (estate rule: the V language is banned):" >&2
 echo "$HITS" | sed 's|^|  |' >&2
 echo "" >&2
-echo "zig has been replaced by zig-unified-api-adapter. Remove these references." >&2
+echo "The V language has been replaced by v-unified-api-adapter. Remove these references." >&2
 exit 1

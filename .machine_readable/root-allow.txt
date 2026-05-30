@@ -20,6 +20,7 @@ PROOF-STATUS.adoc          # proof-discharge status (estate authority file)
 READINESS.adoc             # release-readiness gate state (estate authority file)
 TEST-NEEDS.adoc            # required-test registry (estate authority file)
 TOPOLOGY.adoc              # repo/component topology (estate authority file)
+SKELETON.adoc              # generator-derived RSR skeleton manifest (enforced by skeleton-drift.yml)
 llm-warmup-dev.adoc        # LLM onboarding warm-up (developer); estate-standard root doc
 llm-warmup-user.adoc       # LLM onboarding warm-up (user); estate-standard root doc
 0-AI-MANIFEST.a2ml         # thin pointer to .machine_readable/0.1-AI-MANIFEST.a2ml
