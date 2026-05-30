@@ -21,9 +21,9 @@
 #     co-developed work, per ADR-0005). Its copyright attribution is the
 #     owner's to set, not an agent's; left for manual annotation. It is not
 #     matched by any rule below (no `**/*.yml`, no `.github/**`).
-#   * src/interface/build/ttc/** — generated Idris2 build artifacts. They are
-#     covered as MPL-derived below, but ideally should be git-ignored and
-#     removed from version control rather than licensed.
+#   * src/interface/build/ — generated Idris2 build artifacts: removed from
+#     version control and git-ignored in this change (see .gitignore), so
+#     they no longer need a licensing declaration.
 
 version = 1
 
