@@ -14,9 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `LICENSES/` directory (MPL-2.0, AGPL-3.0-or-later) and a root `REUSE.toml`
   declaring licensing for owner-authored files. The project is now fully
   compliant with version 3.3 of the REUSE Specification (`reuse lint` passes).
-- Claude Code project config (`.claude/settings.json`): a permission allowlist
-  for the safe git / reuse / shellcheck / estate-rules commands used to
-  validate this repo, reducing prompts in future sessions.
+- Claude Code project config under `.claude/`: a permission allowlist for the
+  safe git / reuse / shellcheck / estate-rules commands used to validate this
+  repo, plus a best-effort SessionStart hook that provisions the lint tooling
+  (reuse, shellcheck, asciidoctor) via package managers — no piped remote
+  scripts.
 
 ### Changed
 - Repaired the V-language ban check in the `estate-rules` workflow: a

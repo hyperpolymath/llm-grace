@@ -14,12 +14,13 @@ Thumbs.db
 # Agent & editor scaffolding (standards#68) — local-only, never committed
 # estate-wide. Owner decision 2026-05-16: gitignore per-repo agent/editor
 # config rather than commit it. Updated 2026-05-30: the *shared* Claude
-# config (.claude/settings.json) is now tracked so sessions share a safe
-# permission allowlist; personal local overrides (e.g.
-# .claude/settings.local.json) stay ignored.
+# config (.claude/settings.json + .claude/hooks/) is now tracked so sessions
+# share a permission allowlist and a best-effort tool-provisioning hook;
+# personal local overrides (e.g. .claude/settings.local.json) stay ignored.
 .editorconfig
 .claude/*
 !.claude/settings.json
+!.claude/hooks/
 
 # Build
 /target/
