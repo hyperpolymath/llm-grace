@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MPL-2.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 // SPDX-FileCopyrightText: 2026 Jonathan Jewell (hyperpolymath)
 = llm-grace
+image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=openssourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://github.com/hyperpolymath/llm-grace"]
+
 :toc:
 :toc-placement: preamble
 
-image:https://img.shields.io/badge/License-MPL--2.0-brightgreen.svg[License: MPL-2.0,link="https://www.mozilla.org/MPL/2.0/"]
+image:https://img.shields.io/badge/License-MPL_2.0--2.0-brightgreen.svg[License: MPL-2.0,link="https://www.mozilla.org/MPL/2.0/"]
 image:https://img.shields.io/badge/status-design-orange.svg[Status: design]
 
 Graceful degradation for concurrent LLM/agent terminals. When system
