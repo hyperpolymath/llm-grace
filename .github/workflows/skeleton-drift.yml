@@ -9,7 +9,6 @@
 # from the canonical RSR contract. Regenerate with:
 #   robot-repo-automaton skeleton emit .
 name: Skeleton Drift
-
 on:
   push:
     branches: [main, master]
@@ -19,10 +18,8 @@ on:
     # Weekly: catches canonical changes that land in the generator
     # (gitbot-fleet) but have not yet been pulled into this template.
     - cron: "17 4 * * 1"
-
 permissions:
   contents: read
-
 jobs:
   skeleton-drift:
     runs-on: ubuntu-latest
@@ -30,25 +27,21 @@ jobs:
     steps:
       - name: Checkout template (this repo)
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
       - name: Checkout generator (gitbot-fleet)
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: hyperpolymath/gitbot-fleet
           path: .gitbot-fleet
-
       - name: Install Rust toolchain
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
             | sh -s -- -y --profile minimal
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-
       - name: Build the canonical skeleton generator
         run: |
           cargo build --release \
             --manifest-path .gitbot-fleet/robot-repo-automaton/Cargo.toml \
             --bin robot-repo-automaton
-
       - name: Assert template == canonical skeleton (drift fails)
         run: |
           BIN=.gitbot-fleet/robot-repo-automaton/target/release/robot-repo-automaton
