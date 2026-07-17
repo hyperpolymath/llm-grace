@@ -1,29 +1,67 @@
 # SPDX-License-Identifier: MPL-2.0
 # Clade declaration — part of the gv-clade-index registry
 # See: https://github.com/hyperpolymath/gv-clade-index
+#
+# CORRECTED 2026-07-17. Every identity field in this file used to be
+# rsr-template-repo's, copied in verbatim and never changed:
+#
+#     uuid           = "a5ea1382-a34c-5334-8a46-a2ebe904c810"   <- the template's
+#     canonical-name = "rsr-template-repo"                      <- the template's
+#     prefixed-name  = "rm-rsr-template-repo"                   <- the template's
+#     primary        = "rm"        secondary = ["gv"]           <- the template's
+#     forges         = hyperpolymath/rsr-template-repo (x3)     <- the template's
+#     parent         = "RSR template — scaffold for new repos"  <- the template's
+#
+# This file said llm-grace WAS rsr-template-repo, and told every arriving agent
+# so. `just init` never touched CLADE.a2ml, so the template handed its identity
+# to every repo made from it. Nothing caught it — each value is individually
+# valid. Fixed at source in rsr-template-repo PR #144; chronicles-of-slavia and
+# scaffoldia were corrected on 2026-07-16.
 
 [identity]
-uuid = "a5ea1382-a34c-5334-8a46-a2ebe904c810"
+# THE UUID IS DERIVED, NOT ALLOCATED (gv-clade-index:
+# docs/SPEC-clade-verisim-portal.adoc §Identity Model):
+#     uuid = UUIDv5(namespace = URL, name = "github.com/<owner>/<name>")
+# A fact anyone can recompute and check, not a choice:
+#     uuidgen --sha1 --namespace @url --name "github.com/hyperpolymath/llm-grace"
+#     -> 7a0b7dd8-75bf-53e0-88a4-fb79b03fe42d
+# Method verified first by reproducing the registry's own worked examples
+# byte-for-byte (januskey -> e216170e-…, gv-clade-index -> c88e9ff3-…,
+# rsr-template-repo -> a5ea1382-…). Owner confirmed against `git remote`:
+# hyperpolymath/llm-grace, and the repo exists in no other org.
+uuid = "7a0b7dd8-75bf-53e0-88a4-fb79b03fe42d"
 primary-forge = "github"
 primary-owner = "hyperpolymath"
-canonical-name = "rsr-template-repo"
-prefixed-name = "rm-rsr-template-repo"
+canonical-name = "llm-grace"
+prefixed-name = "ax-llm-grace"
 
 [clade]
-primary = "rm"
-secondary = ["gv"]
-assigned = "2026-03-16"
-rationale = ""
+# The 2 letters abbreviate the CLADE's name below — never the repo's name.
+# All 12 codes: gv-clade-index verisim/seed/clades.a2ml.
+#
+# `rm` here was NOT a judgement that went wrong — it was never a judgement at
+# all. It is rsr-template-repo's own clade, inherited with the rest of its
+# identity. llm-grace has nothing to do with repo scaffolding.
+primary = "ax"
+primary-name = "AI & Neurosymbolic"
+# secondary was ["gv"] — also the template's, also never chosen.
+secondary = []
+assigned = "2026-07-17"
+rationale = "AI & Neurosymbolic (`ax`): \"machine learning, neural proof synthesis, AI governance\" — its keywords include `llm` explicitly. The core value proposition is graceful degradation for concurrent LLM/agent terminals: load-shedding, a shared crash-safe ledger, and legible post-mortems. `ix` (Infrastructure) is the near miss — /proc-signature load-shedding is process-level work — but that is the mechanism, not the point. The point is keeping LLM/agent fleets legible when they fail, which is AI governance. Per the spec the primary clade reflects the value proposition, not implementation details."
 
 [forges]
-github = "hyperpolymath/rsr-template-repo"
-gitlab = "hyperpolymath/rsr-template-repo"
-bitbucket = "hyperpolymath/rsr-template-repo"
+github = "hyperpolymath/llm-grace"
+gitlab = ""       # populated if/when mirrored
+bitbucket = ""    # populated if/when mirrored
 
 [lineage]
 type = "standalone"
-parent = "RSR template — scaffold for new repos"
-born = "2026-03-16"
+# `parent` is a monorepo parent, not a description. It previously held the
+# template's own description, "RSR template — scaffold for new repos".
+parent = ""
+born = "2026-05-18"                     # first commit
+previous-names = []
+instantiated-from = "rsr-template-repo"
 
 # Lifecycle status (added by clade-status-backfill; see gv-clade-index ADR 0006).
 # Identity (uuid) and status are SEPARATE layers: uuid is immortal; phase is a
@@ -33,7 +71,7 @@ born = "2026-03-16"
 [status]
 # One of: reserved incubating active dormant | merged superseded archived extinct
 phase = "active"
-since = "2026-03-16"
+since = "2026-05-18"
 present = true
 aliases = []
 merged-into = ""
@@ -43,5 +81,12 @@ ended = ""
 
 [[status.history]]
 phase = "active"
-since = "2026-03-16"
+since = "2026-05-18"
 note = "backfilled default — correct if the true phase differs"
+
+# ---------------------------------------------------------------------------
+# REGISTRATION STATUS: NOT REGISTERED. llm-grace does not appear in
+# gv-clade-index (verisim/seed/repos.a2ml). The uuid above is correctly derived
+# and self-checking, but DERIVING an identity is not REGISTERING one.
+# Registration is outward-facing and is the owner's act (doctrine 11).
+# ---------------------------------------------------------------------------
