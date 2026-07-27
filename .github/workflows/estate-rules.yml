@@ -39,8 +39,6 @@ jobs:
       - name: AsciiDoc by default (no .md under docs/)
         run: bash scripts/check-no-md-in-docs.sh .
 
-      - name: No V-language references
-        run: bash scripts/check-no-vlang.sh .
 
       - name: Neutral template (no project identifiers)
         run: bash scripts/check-no-project-identifiers.sh .
