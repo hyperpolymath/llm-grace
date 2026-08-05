@@ -18,7 +18,6 @@ permissions:
 jobs:
   trigger-boj:
     runs-on: ubuntu-latest
-    if: ${{ vars.BOJ_SERVER_URL != '' || secrets.BOJ_SERVER_URL != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
