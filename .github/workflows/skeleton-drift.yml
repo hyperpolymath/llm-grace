@@ -1,5 +1,5 @@
-# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
 # skeleton-drift.yml — asserts this template's RSR required-files set is
 # byte-identical to the canonical generator output in
 # hyperpolymath/gitbot-fleet `robot-repo-automaton skeleton`.
