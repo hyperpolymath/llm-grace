@@ -1,0 +1,77 @@
+https://www.mozilla.org/MPL/2.0/[image:https://img.shields.io/badge/License-MPL--2.0-brightgreen.svg[License:
+MPL-2.0]]
+image:https://img.shields.io/badge/status-design-orange.svg[Status:
+design]
+
+Graceful degradation for concurrent LLM/agent terminals. When system
+resources get hairy, sessions back off *voluntarily and in priority
+order* — before the OS OOM-kills everything at once — so the work that
+matters survives and a returning human comes back to an *autopsy, not a
+smoking crater*.
+
+== Why
+
+Run several agent terminals on one box and the failure mode is brutal:
+nothing backs off, memory craters, and the OS kills the whole VM — every
+session dies at once, ungracefully, mid-thought. `+llm-grace+` makes
+that failure *legible, bounded, and recoverable*.
+
+== How (one paragraph)
+
+A tiny monitor reads cheap signals the kernel already emits (`+/proc+`
+counters — memory, swap-out rate, iowait, disk saturation, loadavg) and
+reads them as *signatures*, not thresholds: the classic "`disk-thrash +
+low CPU`" pattern is the pre-OOM tell. Sessions coordinate through one
+shared crash-safe LMDB ledger. Under pressure, the *least valuable* work
+yields first — value measured as motion, not size, so a thrashing
+runaway is shed before productive work — climbing a per-session ladder:
+silent PAUSE (auto-resumes) → CHECKPOINT (a human-in-the-loop latch,
+loud) → clean TERMINATE (state already saved, never auto-relaunched).
+Every transition is timestamped; terminated sessions get a per-session
+autopsy, and the whole episode aggregates into one timeline so you can
+see *how it went wobbly*.
+
+== Ethos (anti-failure-theatre)
+
+The autopsy and death-spiral timeline are fallbacks you hope never to
+read, *not features to admire*. Success is the tool’s own invisibility:
+thousands of silent cheap pauses, near-zero loud events. If you read
+autopsies often, the tool has failed at its real job. No warranty — the
+promise is not "`it won’t go wrong`" but "`when it does, you’ll know
+exactly what killed you, and nothing is lost.`"
+
+== Status
+
+Design phase. The architecture is decided and recorded as ADRs:
+
+* link:docs/decisions/0003-graceful-degradation-architecture.adoc[ADR-0003
+— full architecture]
+* link:docs/decisions/0004-attention-decay-vs-persist.adoc[ADR-0004 —
+attention: persist]
+* link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005
+— licensing posture (deliberate MPL-2.0 exception; no PMPL debt)]
+
+Build is tracked as native sub-issues under the requirements epic. First
+adapter targets Claude Code hooks (`+PreToolUse+`, `+UserPromptSubmit+`,
+`+SessionStart+`); the core idea is adapter-agnostic. It will be built
+*test-first* against a controlled memory balloon in an isolated session
+before anything goes global.
+
+== Licence
+
+*MPL-2.0* (see LICENSE) — legally effective today.
+
+This is a *deliberate, owner-ruled standalone exception* to the estate
+canonical `+MPL-2.0+`, not drift. It is consistent with the estate
+model: `+MPL-2.0+` (= Palimpsest-MPL) has MPL-2.0 as its automatic legal
+base, so an MPL-2.0 repo is a clean subset. There is *no* "`PMPL
+relicensing debt`" — that framing was a corrected false premise.
+Canonical policy: `+hyperpolymath/standards+` `+LICENCE-POLICY.adoc+`.
+Rationale:
+link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005].
+
+== Provenance / housekeeping
+
+Scaffolded from `+rsr-template-repo+` (the neutral RSR skeleton). The
+full RSR placeholder bootstrap and the per-file SPDX relicense are
+tracked build sub-issues rather than rushed inline — foundation-first.
