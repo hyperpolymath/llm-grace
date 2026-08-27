@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 # This workflow is managed by gh actions-lock.
+# This workflow is managed by gh actions-lock.
 # OpenSSF Best Practices compliance gate — blocks PRs and pushes that lack
 # required files or still contain unfilled placeholder tokens.
 name: OpenSSF Compliance
