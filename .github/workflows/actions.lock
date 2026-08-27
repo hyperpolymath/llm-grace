@@ -3,11 +3,15 @@
 # Docs: https://gh.io/actions-lockfile
 version: 'v0.0.2'
 workflows:
+    '.github/workflows/e2e.yml': []
+    '.github/workflows/governance.yml': []
+    '.github/workflows/scorecard.yml': []
+    '.github/workflows/secret-scanner.yml': []
     '.github/workflows/boj-build.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/codeql.yml':
         - 'actions/checkout@v7.0.1'
-        - 'github/codeql-action@v4.37.4'
+        - 'github/codeql-action@v4.37.8'
     '.github/workflows/dependabot-automerge.yml':
         - 'dependabot/fetch-metadata@v3.1.0'
     '.github/workflows/dogfood-gate.yml':
@@ -19,7 +23,7 @@ workflows:
         - 'actions/github-script@v9.0.0'
         - 'actions/upload-artifact@v7.0.1'
         - 'erlef/setup-beam@v1.24.1'
-        - 'github/codeql-action@v4.37.4'
+        - 'github/codeql-action@v4.37.8'
     '.github/workflows/instant-sync.yml':
         - 'peter-evans/repository-dispatch@v4.0.1'
     '.github/workflows/k9iser-regen.yml':
@@ -41,10 +45,10 @@ workflows:
     '.github/workflows/rust-ci.yml':
         - 'actions/checkout@v7.0.1'
         - 'dtolnay/rust-toolchain@master'
-        - 'swatinem/rust-cache@v2.9.1'
+        - 'swatinem/rust-cache@v2.9.2'
     '.github/workflows/scorecard-enforcer.yml':
         - 'actions/checkout@v7.0.1'
-        - 'github/codeql-action@v4.37.4'
+        - 'github/codeql-action@v4.37.8'
         - 'ossf/scorecard-action@v2.4.4'
     '.github/workflows/skeleton-drift.yml':
         - 'actions/checkout@v7.0.1'
@@ -76,7 +80,7 @@ dependencies:
         repo_id: 192625955
     'dawidd6/action-send-mail@v3.12.0':
         ref: 'v3.12.0'
-        commit: 'sha1-2e600f3776677e493bf0da7aaec39a586d19a5ed'
+        commit: 'sha1-94de994a9f6fffee200243214e17002e2920bb59'
         owner_id: 9713907
         repo_id: 222439721
     'dependabot/fetch-metadata@v3.1.0':
@@ -94,9 +98,9 @@ dependencies:
         commit: 'sha1-54075bcc5e249e4758d363f27d099f55d843f124'
         owner_id: 47606891
         repo_id: 331103973
-    'github/codeql-action@v4.37.4':
-        ref: 'v4.37.4'
-        commit: 'sha1-f205ea1c3313d32999d8d6a48b4f6530d4437b38'
+    'github/codeql-action@v4.37.8':
+        ref: 'v4.37.8'
+        commit: 'sha1-db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
         owner_id: 9919
         repo_id: 259445878
     'ossf/scorecard-action@v2.4.4':
@@ -114,9 +118,9 @@ dependencies:
         commit: 'sha1-3d0d9888cb7fd7b750713d6e236d1fcb99157228'
         owner_id: 2242
         repo_id: 204253808
-    'swatinem/rust-cache@v2.9.1':
-        ref: 'v2.9.1'
-        commit: 'sha1-c19371144df3bb44fab255c43d04cbc2ab54d1c4'
+    'swatinem/rust-cache@v2.9.2':
+        ref: 'v2.9.2'
+        commit: 'sha1-6323deb102c322ba6fcbdcafc7e3dddab59af2b6'
         owner_id: 580492
         repo_id: 298565987
     'webfactory/ssh-agent@v0.10.0':
