@@ -27,6 +27,7 @@ llm-warmup-user.adoc       # LLM onboarding warm-up (user); estate-standard root
 LICENSE
 REUSE.toml                 # REUSE-spec bulk licensing declaration (owner-authored files)
 CHANGELOG.md
+CHANGELOG.adoc             # Current changelog after the AsciiDoc migration.
 
 # ─── Build entry points (must live at root for their tooling) ────────────────
 Justfile                   # delegates phases to build/just/*.just
@@ -45,13 +46,16 @@ coordination.k9            # repo-local session binding (template-mandated)
 # canonical, link-target ones per docs/governance/TEMPLATE-STANDARDS-AUDIT.adoc
 # ("Actual files are CONTRIBUTING.md … SECURITY.md. Fixed README links …").
 CONTRIBUTING.md
+CONTRIBUTING.adoc          # Current contributor guide after the AsciiDoc migration.
 SECURITY.md
+SECURITY.adoc              # Current security policy after the AsciiDoc migration.
 
 # ─── Directories ─────────────────────────────────────────────────────────────
 .claude/                   # committed Claude Code config (settings.json + hooks/)
 .devcontainer/             # VS Code dev container spec; tool-required at root
 .git/
 .github/                   # CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, workflows/
+www/                       # site-operations bundle; canonical .well-known/ lives at www/.well-known/ (issue #53)
 .machine_readable/         # AI manifests, contractiles, custom-format configs
 .well-known/
 LICENSES/                  # REUSE-spec license texts (LICENSES/<SPDX-ID>.txt)
