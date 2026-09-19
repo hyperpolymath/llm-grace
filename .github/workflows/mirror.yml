@@ -17,11 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.GITLAB_MIRROR_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: webfactory/ssh-agent@v0.10.0
+      - uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555  # v0.10.0
         with:
           ssh-private-key: ${{ secrets.GITLAB_SSH_KEY }}
 
@@ -35,11 +35,11 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.BITBUCKET_MIRROR_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: webfactory/ssh-agent@v0.10.0
+      - uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555  # v0.10.0
         with:
           ssh-private-key: ${{ secrets.BITBUCKET_SSH_KEY }}
 
@@ -53,11 +53,11 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.CODEBERG_MIRROR_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: webfactory/ssh-agent@v0.10.0
+      - uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555  # v0.10.0
         with:
           ssh-private-key: ${{ secrets.CODEBERG_SSH_KEY }}
 
@@ -71,11 +71,11 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.SOURCEHUT_MIRROR_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: webfactory/ssh-agent@v0.10.0
+      - uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555  # v0.10.0
         with:
           ssh-private-key: ${{ secrets.SOURCEHUT_SSH_KEY }}
 
@@ -89,11 +89,11 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.DISROOT_MIRROR_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: webfactory/ssh-agent@v0.10.0
+      - uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555  # v0.10.0
         with:
           ssh-private-key: ${{ secrets.DISROOT_SSH_KEY }}
 
@@ -107,11 +107,11 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.GITEA_MIRROR_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: webfactory/ssh-agent@v0.10.0
+      - uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555  # v0.10.0
         with:
           ssh-private-key: ${{ secrets.GITEA_SSH_KEY }}
 
@@ -125,12 +125,14 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.RADICLE_MIRROR_ENABLED == 'true'
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de  # master
+        with:
+          toolchain: master
         with:
           toolchain: stable
 
