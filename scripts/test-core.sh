@@ -16,6 +16,7 @@ if [[ -n ${LMDB_PREFIX:-} ]]; then
 fi
 # An independent timeout prevents a writer-lock regression from hanging CI.
 timeout --kill-after=5s 60s zig test src/signal/sampler.zig "$@"
+timeout --kill-after=5s 60s zig test --dep sampler -Mroot=src/monitor/monitor.zig -Msampler=src/signal/sampler.zig -lc "$@"
 timeout --kill-after=5s 60s zig test src/control/ladder.zig "$@"
 timeout --kill-after=5s 60s zig test src/control/safety.zig "$@"
 timeout --kill-after=5s 60s zig test src/ledger/lmdb.zig "${lmdb[@]}" -lc "$@"

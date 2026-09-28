@@ -156,3 +156,39 @@ or missing license texts. Existing SPDX/copyright lines and `LICENSE`, `LICENSES
 The live monitor, per-session collection/autoconnection, bounded IPC, retention,
 and isolated resource-pressure acceptance tests remain incomplete. No issue was
 closed, and no global hooks or active load-shedding were installed.
+
+== Follow-up: Observe-Only Monitor Milestone
+
+Added `src/monitor/monitor.zig` as a read-only monitor boundary. It holds an
+exclusive nonblocking kernel lock for single-instance ownership, performs
+bounded reads (including a one-byte oversize probe), uses monotonic due checks,
+and distinguishes invalid/stale data from valid observations. Whole-device
+selection is re-discovered from `/sys/block`, excludes partition markers and
+stacked devices without a `device` link, and compares both name and major:minor
+identity before reducing disk activity. Session observation brackets status and
+transcript metadata with bounded `/proc/PID/stat` reads; the caller must provide
+PID plus start-time identity, preventing a reused PID from being silently
+accepted. RSS comes from VmRSS and motion is inferred from transcript byte growth
+and monotonic no-growth duration. The monitor does not write to the ledger,
+send signals, invoke hooks, or alter observed processes.
+
+Fixture evidence: the monitor suite has 10 tests covering lock exclusion and
+release, bounded-read limit behavior, synthetic sysfs discovery, monotonic
+cadence, host baseline/delta/device-replacement handling, explicit invalid/stale
+states, and session identity/RSS/motion/PID-reuse behavior. Combined core tests
+now total 29 test blocks (10 sampler/classifier, 10 monitor, 2 ladder, 2 safety,
+5 LMDB). `scripts/test-core.sh -O Debug` and `-O ReleaseSafe` both passed locally
+with Zig 0.15.2 and LMDB 0.9.33. LMDB was built outside the repository from the
+PyPI `lmdb` source archive; these are local test results, not hosted CI results.
+`zig fmt --check src/monitor/monitor.zig src/signal/sampler.zig` passed.
+
+A one-epoch read-only smoke call against this sandbox's live `/proc` and
+`/sys` completed and correctly returned `invalid: missing` because no prior
+baseline existed. It did not wait for or validate a second live interval.
+Not established: accuracy of paired live samples on supported hosts, all sysfs
+storage topologies, a resident daemon/session
+enumerator, startup identity authentication, schema/retention/IPC behavior,
+actual OFF propagation through a running integration, disk-full/I/O failure,
+crash-durability under host/VM failure, or resource-pressure acceptance. No
+balloon or global hook was installed or run. Issue #4 remains open; issue #2
+remains owner-only and unchanged.
