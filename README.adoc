@@ -69,11 +69,13 @@ scripts/run.sh help
 scripts/run.sh check
 scripts/run.sh test Debug
 scripts/run.sh test ReleaseSafe
+scripts/run.sh observe --once
 just --list
 ----
 
-This is a development dispatcher, not an application launcher. Build, install,
-start, and system-integration requests fail explicitly until a real runtime
+This is a development dispatcher, not an application launcher. `observe --once`
+performs one explicit read-only host sample; build, install, service start, and
+system-integration requests fail explicitly until a real application runtime
 exists. See link:docs/developer/ENTRYPOINTS.adoc[entrypoint boundaries and AI setup].
 
 == Licence

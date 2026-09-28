@@ -4,6 +4,7 @@ const std = @import("std");
 const sampler = @import("sampler");
 const c = @cImport({
     @cInclude("sys/file.h");
+    @cInclude("sys/stat.h");
     @cInclude("fcntl.h");
     @cInclude("unistd.h");
 });
@@ -42,8 +43,17 @@ pub const Ownership = struct {
     fd: c_int,
 
     pub fn acquire(path: [*:0]const u8) !Ownership {
-        const fd = c.open(path, c.O_CREAT | c.O_RDWR | c.O_CLOEXEC, @as(c_uint, 0o600));
+        const fd = c.open(path, c.O_CREAT | c.O_RDWR | c.O_CLOEXEC | c.O_NOFOLLOW, @as(c_uint, 0o600));
         if (fd < 0) return error.LockOpenFailed;
+        var metadata: c.struct_stat = undefined;
+        if (c.fstat(fd, &metadata) != 0 or
+            (metadata.st_mode & c.S_IFMT) != c.S_IFREG or
+            (metadata.st_mode & @as(c_uint, 0o077)) != 0 or
+            metadata.st_uid != c.geteuid())
+        {
+            _ = c.close(fd);
+            return error.UntrustedLockFile;
+        }
         if (c.flock(fd, c.LOCK_EX | c.LOCK_NB) != 0) {
             _ = c.close(fd);
             return error.AlreadyOwned;
@@ -286,15 +296,16 @@ pub fn checkedSystemSample(
 ) Observation(sampler.Snapshot) {
     if (previous_raw == null) return .{ .invalid = .missing };
     if (!sameDevices(previous_devices, current_devices)) return .{ .invalid = .device_changed };
-    if (interval_ns == 0 or interval_ns % std.time.ns_per_ms != 0) return .{ .invalid = .malformed };
+    const interval_ms = interval_ns / std.time.ns_per_ms;
+    if (interval_ms == 0) return .{ .invalid = .malformed };
     const current = sampler.sampleChecked(meminfo, vmstat, stat, loadavg, current_diskstats) catch return .{ .invalid = .malformed };
     var names: [128][]const u8 = undefined;
     if (current_devices.len > names.len) return .{ .invalid = .oversized };
     for (current_devices, 0..) |device, i| names[i] = device.name;
-    const busy = sampler.diskBusyPercent(previous_diskstats, current_diskstats, names[0..current_devices.len], interval_ns / std.time.ns_per_ms) catch |err| {
+    const busy = sampler.diskBusyPercent(previous_diskstats, current_diskstats, names[0..current_devices.len], interval_ms) catch |err| {
         return .{ .invalid = if (err == error.CounterReset) .counter_reset else if (err == error.MissingDevice or err == error.DuplicateDevice) .device_changed else .malformed };
     };
-    const result = sampler.reduceChecked(previous_raw.?, current, interval_ns / std.time.ns_per_ms, busy, gpu_util_pct) catch |err| {
+    const result = sampler.reduceChecked(previous_raw.?, current, interval_ms, busy, gpu_util_pct) catch |err| {
         return .{ .invalid = if (err == error.CounterReset) .counter_reset else .malformed };
     };
     return .{ .valid = result };
@@ -501,6 +512,11 @@ test "single-instance lock excludes another owner and releases on close" {
     first.release();
     var second = try Ownership.acquire(lock_path.ptr);
     second.release();
+
+    try tmp.dir.symLink("monitor.lock", "monitor-link", .{});
+    const symlink_path = try std.fmt.allocPrintSentinel(std.testing.allocator, "{s}/monitor-link", .{path}, 0);
+    defer std.testing.allocator.free(symlink_path);
+    try std.testing.expectError(error.LockOpenFailed, Ownership.acquire(symlink_path.ptr));
 }
 
 test "stable selection excludes partitions and virtual devices, catches identity changes" {
@@ -613,6 +629,8 @@ test "checked host fixture requires a baseline and stable whole-device epoch" {
     };
     try std.testing.expectEqual(@as(u8, 50), snapshot.io_ticks_pct);
     try std.testing.expectEqual(@as(u64, 2), snapshot.pswpout_delta);
+    const fractional_ms = checkedSystemSample(baseline, disk_before, disk_after, &devices, &devices, mem_after, vm_after, cpu_after, load, std.time.ns_per_s + 1, null);
+    try std.testing.expect(fractional_ms == .valid);
     const replaced = [_]Device{.{ .name = "sda", .major_minor = "259:0" }};
     try std.testing.expectEqual(InvalidReason.device_changed, (checkedSystemSample(baseline, disk_before, disk_after, &devices, &replaced, mem_after, vm_after, cpu_after, load, std.time.ns_per_s, null)).invalid);
     try std.testing.expectEqual(InvalidReason.malformed, (checkedSystemSample(baseline, disk_before, disk_after, &devices, &devices, mem_after, vm_after, cpu_after, load, 0, null)).invalid);

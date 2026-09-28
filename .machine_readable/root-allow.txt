@@ -83,3 +83,4 @@ tools/                     # TODO: consolidate with scripts/ or document the spl
 
 # Local Zig test/build cache; ignored by Git, created by `just test`.
 .zig-cache/
+zig-out/                      # Explicitly generated monitor binary output; ignored by Git.

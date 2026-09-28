@@ -101,6 +101,10 @@ clean-all: clean
 test mode="Debug":
     bash scripts/dev.sh test {{mode}}
 
+# Explicitly build and run the read-only observer; use `-- --once` for one epoch.
+monitor *args:
+    bash scripts/dev.sh monitor {{args}}
+
 # Zig's test runner already reports each named test and its outcome.
 test-verbose:
     just test

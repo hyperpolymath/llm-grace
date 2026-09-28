@@ -142,9 +142,11 @@ selection heuristic, not proof that unusual stacked devices never overlap.
 
 Still required before closure:
 
-* Exercise the concrete live `/proc` + `/sys` collector on supported hosts and
-  validate freshness/accuracy across representative device topologies. No
-  resident daemon or managed session-enumeration loop is started by this module.
+* A paired foreground `/proc` + `/sys` sample now passed on this sandbox host
+  after fixing sub-millisecond monotonic interval handling. Validate paired
+  freshness/accuracy on additional supported hosts and representative storage
+  topologies. There is no daemonized/autostart service or managed
+  session-enumeration loop.
 * Session startup/autoconnection, authenticated identity capture, versioned
   record schema, heartbeat/retention policy, retry deduplication, and bounded
   IPC/backpressure.

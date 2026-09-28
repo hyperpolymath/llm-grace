@@ -16,6 +16,7 @@ llm-grace development commands
   scripts/dev.sh check        Run lint, Zig formatting, and repository checks.
   scripts/dev.sh test [MODE]  Run the core tests (Debug or ReleaseSafe; default Debug).
   scripts/dev.sh just [ARGS]  Forward arguments to the Just task runner.
+  scripts/dev.sh monitor [ARGS] Build and explicitly invoke the read-only monitor.
   scripts/dev.sh status       Report that no service runtime is configured.
   scripts/dev.sh run          Explain why there is no runnable service yet (fails).
 
@@ -137,8 +138,19 @@ case "$command_name" in
         need just
         exec just "$@"
         ;;
-    build|build-release|install|run|run-verbose|start|--start|--auto|--browser|--web|--integ|--disinteg)
-        fail "there is no application binary or resident monitor to build, install, or launch; use 'scripts/dev.sh test' or 'check'"
+    monitor|observe)
+        [[ "${1:-}" != -- ]] || shift
+        need zig
+        [[ "$(zig version)" == 0.15.2 ]] || fail "Zig 0.15.2 required (found $(zig version))"
+        mkdir -p zig-out/bin
+        zig build-exe --dep monitor --dep sampler -Mroot=src/monitor/main.zig -lc --dep sampler -Mmonitor=src/monitor/monitor.zig -Msampler=src/signal/sampler.zig -O Debug -femit-bin=zig-out/bin/llm-grace-monitor
+        exec zig-out/bin/llm-grace-monitor "$@"
+        ;;
+    build|build-release|install)
+        fail "there is no root application build/install target; use 'scripts/dev.sh monitor --once' for the explicit read-only observer"
+        ;;
+    run|run-verbose|start|--start|--auto|--browser|--web|--integ|--disinteg)
+        fail "there is no application or managed service to launch or integrate; use 'scripts/dev.sh monitor --once' for explicit read-only observation"
         ;;
     *)
         fail "unknown command '$command_name' (run scripts/dev.sh help)"

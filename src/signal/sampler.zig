@@ -10,6 +10,7 @@
 const std = @import("std");
 const cls = @import("classifier.zig");
 pub const Snapshot = cls.Snapshot;
+pub const classify = cls.classify;
 
 /// Raw cumulative counters from one read of /proc.
 pub const Raw = struct {
