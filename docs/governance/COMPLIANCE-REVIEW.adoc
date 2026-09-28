@@ -192,3 +192,35 @@ actual OFF propagation through a running integration, disk-full/I/O failure,
 crash-durability under host/VM failure, or resource-pressure acceptance. No
 balloon or global hook was installed or run. Issue #4 remains open; issue #2
 remains owner-only and unchanged.
+
+== Follow-up: Local Development and AI Entry Points
+
+Added `scripts/run.sh` as the stable shell entrypoint and `scripts/dev.sh` as its
+non-installing dispatcher. Supported commands are help/version/status/stop,
+`doctor`, `check`, `lint`, and Debug/ReleaseSafe core tests. Requests to build,
+install, start, or integrate an application fail explicitly because no app or
+monitor service exists. The launcher standard's required service lifecycle and
+system-integration modes are therefore **not** claimed as implemented. The
+upstream standard was consulted by reference; no copied standard or global
+launcher integration was added.
+
+The Justfile now delegates implemented test/quality actions, uses Zig formatting,
+executes existing aspect checks, reports tool requirements without installing,
+and only removes `.zig-cache/` and `zig-out/` in `just clean` (the tracked
+`build/` source tree was verified to remain). Unsupported build/run/install,
+benchmark, and E2E paths no longer print success. Added a test guarding those
+failure boundaries. Claude and Gemini instructions now point to shared repo
+conventions; Copilot's broken convention path was corrected. The Claude
+SessionStart hook is now read-only and performs no package installation.
+
+Executed locally with Just 1.58.0, Zig 0.15.2 and LMDB 0.9.33 from an external
+`LMDB_PREFIX`: `just --list`, `just doctor`, `just check`, `just lint`,
+`just test Debug`, and `just test ReleaseSafe` pass. `just check` validated 20 shell scripts, 23
+workflows / 7 required workflows, state required fields, compliance regression
+cases, and the root allowlist. Entrypoint regression checks passed, and
+`just clean` preserved `build/`. ShellCheck 0.11.0.1 passed on the six changed
+shell scripts; no claim is made for an estate-wide ShellCheck run. This is not
+evidence that all 688 lines of Justfile recipes or all template/container
+scaffolding are production-ready; only named recipes were exercised. Desktop
+integration, app start/stop, and full launcher-standard conformance have not
+been established. Existing SPDX declarations and issue #2 were not changed.

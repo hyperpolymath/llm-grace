@@ -42,7 +42,11 @@ exactly what killed you, and nothing is lost.`"
 
 == Status
 
-Design phase. The architecture is decided and recorded as ADRs:
+The project has tested sampler/classifier and LMDB primitives plus a
+fixture-tested, observe-only monitor API. There is no resident daemon, session
+startup integration, production hook, or deployable application yet; issue #4
+remains open. See ADR-0006 and the compliance review for tested evidence and
+remaining gates. The architecture is recorded as ADRs:
 
 * link:docs/decisions/0003-graceful-degradation-architecture.adoc[ADR-0003
 — full architecture]
@@ -56,6 +60,21 @@ adapter targets Claude Code hooks (`+PreToolUse+`, `+UserPromptSubmit+`,
 `+SessionStart+`); the core idea is adapter-agnostic. It will be built
 *test-first* against a controlled memory balloon in an isolated session
 before anything goes global.
+
+== Developer Entry Points
+
+[source,shell]
+----
+scripts/run.sh help
+scripts/run.sh check
+scripts/run.sh test Debug
+scripts/run.sh test ReleaseSafe
+just --list
+----
+
+This is a development dispatcher, not an application launcher. Build, install,
+start, and system-integration requests fail explicitly until a real runtime
+exists. See link:docs/developer/ENTRYPOINTS.adoc[entrypoint boundaries and AI setup].
 
 == Licence
 

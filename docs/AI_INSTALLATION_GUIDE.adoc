@@ -15,19 +15,25 @@ user work based on this scaffolding.
 ----
 git clone https://github.com/hyperpolymath/llm-grace.git
 cd llm-grace
-bash scripts/check-root-shape.sh .
-bash scripts/check-state.sh
-bash tests/workflows/compliance_regression_test.sh
+scripts/run.sh help
+scripts/run.sh check
 ----
 
-Read `README.adoc`, `AUDIT.adoc`, `READINESS.adoc`, `SECURITY.adoc`, and
-`docs/decisions/0003-graceful-degradation-architecture.adoc` before making changes.
-With Just installed, `just validate` runs the local structural/documentation
-gates. Zig and Idris2 are needed for compiler checks; skipped checks do not
-constitute build evidence. `just security` additionally requires Trivy and
-Gitleaks. Consult `.tool-versions` and the component build documentation before
-selecting compiler versions. Do not pipe remote installation scripts into a shell
-without reviewing and verifying their provenance.
+Read `CLAUDE.md`, `docs/practice/AI-CONVENTIONS.adoc`, `README.adoc`, `AUDIT.adoc`,
+`READINESS.adoc`, `SECURITY.adoc`, and the applicable ADRs before making changes.
+The shell entrypoint is `scripts/run.sh`; it delegates to `scripts/dev.sh` and
+never starts a monitor or installs hooks. If Just is installed, use `just --list`
+and the same repository recipes (`just check`, `just test Debug`,
+`just test ReleaseSafe`). `GEMINI.md`, `.github/copilot-instructions.md`, and
+`.claude/settings.json` are provider-specific entrypoints that point to the same
+repo conventions.
+
+Zig 0.15.2, GNU `timeout`, and LMDB development headers/library are required for
+core tests. Set `LMDB_PREFIX` when LMDB is installed outside system paths. Missing
+tools are reported by `scripts/dev.sh doctor`; no package installation is
+performed automatically. Consult `.tool-versions` and component build notes
+before selecting compiler versions. Do not pipe remote installation scripts into
+a shell without reviewing and verifying their provenance.
 
 == Privacy and Isolation
 

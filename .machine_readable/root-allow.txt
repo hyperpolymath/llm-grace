@@ -34,6 +34,8 @@ Justfile                   # delegates phases to build/just/*.just
 coordination.k9            # repo-local session binding (template-mandated)
 
 # ─── Conventional dotfiles (tool-required at root) ───────────────────────────
+CLAUDE.md                   # Provider-specific pointer to the canonical AI conventions.
+GEMINI.md                   # Provider-specific pointer to CLAUDE.md; avoids rule duplication.
 .editorconfig
 .envrc
 .gitattributes
