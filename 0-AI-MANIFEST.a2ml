@@ -41,5 +41,5 @@ status = "Local guardrail repairs; full RSR and release compliance not certified
 [core-implementation]
 issue = "https://github.com/hyperpolymath/llm-grace/issues/4"
 decision = "docs/decisions/0006-ledger-and-proof-boundaries.adoc"
-status = "Tested primitives; no live monitor, session autoconnection, or global deployment"
+status = "Observe-only monitor API and fixtures tested; no session autoconnection, resident daemon, hook integration, or global deployment"
 proofs = "Finite policy tests only; no new formal proofs claimed"

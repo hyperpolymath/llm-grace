@@ -143,8 +143,8 @@ The existing Estate Rules workflow now runs core tests in both build modes;
 hosted execution has not yet been observed.
 
 `just validate`, the compliance regression suite, ShellCheck on reviewed scripts,
-Zig formatting, and `git diff --check` pass. The root allowlist now explicitly
-permits the ignored `.zig-cache/` produced by those real tests.
+Zig formatting, and `git diff --check` pass. The root allowlist explicitly
+permits ignored `.zig-cache/` test state and `zig-out/` generated monitor output.
 `just e2e` explicitly fails until the live monitor/hook acceptance suite exists;
 it no longer claims success without running anything.
 
@@ -153,6 +153,85 @@ have license information at this checkpoint, with zero invalid SPDX expressions
 or missing license texts. Existing SPDX/copyright lines and `LICENSE`, `LICENSES/`,
 `REUSE.toml` are unchanged. This is still an owner review, not an agent fix queue.
 
-The live monitor, per-session collection/autoconnection, bounded IPC, retention,
-and isolated resource-pressure acceptance tests remain incomplete. No issue was
-closed, and no global hooks or active load-shedding were installed.
+Cross-topology live-monitor acceptance, managed per-session collection and
+identity capture, bounded IPC, retention, and isolated resource-pressure tests
+remain incomplete. No issue was closed, and no global hooks or active
+load-shedding were installed.
+
+== Follow-up: Observe-Only Monitor Milestone
+
+Added `src/monitor/monitor.zig` as a read-only monitor boundary. It holds an
+exclusive nonblocking kernel lock for single-instance ownership, performs
+bounded reads (including a one-byte oversize probe), uses monotonic due checks,
+and distinguishes invalid/stale data from valid observations. Whole-device
+selection is re-discovered from `/sys/block`, excludes partition markers and
+stacked devices without a `device` link, and compares both name and major:minor
+identity before reducing disk activity. Session observation brackets status and
+transcript metadata with bounded `/proc/PID/stat` reads; the caller must provide
+PID plus start-time identity, preventing a reused PID from being silently
+accepted. RSS comes from VmRSS and motion is inferred from transcript byte growth
+and monotonic no-growth duration. The monitor does not write to the ledger,
+send signals, invoke hooks, or alter observed processes.
+
+Fixture evidence: the monitor suite has 10 tests covering lock exclusion and
+release, bounded-read limit behavior, synthetic sysfs discovery, monotonic
+cadence, host baseline/delta/device-replacement handling, explicit invalid/stale
+states, and session identity/RSS/motion/PID-reuse behavior. Combined core tests
+now total 29 test blocks (10 sampler/classifier, 10 monitor, 2 ladder, 2 safety,
+5 LMDB). `scripts/test-core.sh -O Debug` and `-O ReleaseSafe` both passed locally
+with Zig 0.15.2 and LMDB 0.9.33. LMDB was built outside the repository from the
+PyPI `lmdb` source archive; these are local test results, not hosted CI results.
+`zig fmt --check src/monitor/monitor.zig src/signal/sampler.zig` passed.
+
+Added `src/monitor/main.zig` as an explicitly invoked foreground JSONL CLI with
+help/version, one-shot/count/interval options, and a private XDG runtime lock
+(default interval: 10 seconds). `scripts/dev.sh monitor`, `scripts/run.sh observe`,
+and `just monitor` build and invoke it; no daemon or autostart integration is
+created. `scripts/test-core.sh` compiles it and checks help/version in both Debug and
+ReleaseSafe runs. The collector rejects symlink/non-regular or incorrectly
+owned/permissive lock files. A live paired run on this sandbox
+returned `invalid:missing` for the initial baseline and a valid `idle_tell`
+observation on the next sample; fixing the run also exposed and repaired
+fractional-millisecond monotonic intervals. This is one Linux sandbox host,
+not broad topology evidence.
+
+Not established: paired accuracy across supported hosts and storage topologies,
+managed session discovery/startup identity authentication, schema/retention/IPC
+behavior, actual OFF propagation through a running integration, disk-full/I/O
+failure, crash-durability under host/VM failure, or resource-pressure
+acceptance. No balloon or global hook was installed or run. Issue #4 remains
+open; issue #2 remains owner-only and unchanged.
+
+== Follow-up: Local Development and AI Entry Points
+
+Added `scripts/run.sh` as the stable shell entrypoint and `scripts/dev.sh` as its
+non-installing dispatcher. Supported commands are help/version/status/stop,
+`doctor`, `check`, `lint`, Debug/ReleaseSafe core tests, and the explicit
+foreground read-only monitor described above. Requests to build/install a root
+application, start a managed service, or integrate an application fail
+explicitly because no app or monitor service exists. The launcher standard's
+required service lifecycle and system-integration modes are therefore **not**
+claimed as implemented. The
+upstream standard was consulted by reference; no copied standard or global
+launcher integration was added.
+
+The Justfile now delegates implemented test/quality actions, uses Zig formatting,
+executes existing aspect checks, reports tool requirements without installing,
+and only removes `.zig-cache/` and `zig-out/` in `just clean` (the tracked
+`build/` source tree was verified to remain). Unsupported build/run/install,
+benchmark, and E2E paths no longer print success. Added a test guarding those
+failure boundaries. Claude and Gemini instructions now point to shared repo
+conventions; Copilot's broken convention path was corrected. The Claude
+SessionStart hook is now read-only and performs no package installation.
+
+Executed locally with Just 1.58.0, Zig 0.15.2 and LMDB 0.9.33 from an external
+`LMDB_PREFIX`: `just --list`, `just doctor`, `just check`, `just lint`,
+`just test Debug`, and `just test ReleaseSafe` pass. `just check` validated 20 shell scripts, 23
+workflows / 7 required workflows, state required fields, compliance regression
+cases, and the root allowlist. Entrypoint regression checks passed, and
+`just clean` preserved `build/`. ShellCheck 0.11.0.1 passed on the six changed
+shell scripts; no claim is made for an estate-wide ShellCheck run. This is not
+evidence that all 688 lines of Justfile recipes or all template/container
+scaffolding are production-ready; only named recipes were exercised. Desktop
+integration, app start/stop, and full launcher-standard conformance have not
+been established. Existing SPDX declarations and issue #2 were not changed.

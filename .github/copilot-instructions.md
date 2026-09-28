@@ -1,13 +1,15 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 <!-- Copyright (c) 2026 Jonathan Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk> -->
-<!-- Authoritative source: docs/AI-CONVENTIONS.md -->
+<!-- Authoritative source: docs/practice/AI-CONVENTIONS.adoc -->
 
 # Copilot Instructions
 
 ## Before Writing Code
 
-- Read `.machine_readable/STATE.a2ml` for canonical file locations.
-- State files (.a2ml) live in `.machine_readable/` ONLY, never the root.
+- Read `0-AI-MANIFEST.a2ml`, `.machine_readable/STATE.a2ml`, and `docs/practice/AI-CONVENTIONS.adoc` before making changes.
+- State and policy files (.a2ml) live in `.machine_readable/` ONLY, never the root.
+
+The authoritative conventions live in `docs/practice/AI-CONVENTIONS.adoc`.
 
 ## License
 

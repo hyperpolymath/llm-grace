@@ -121,19 +121,35 @@ by this review; do not infer one from the repository name.
 
 == Closure Criteria for Issue #4
 
-Completed locally: checked sampler primitives, bounded ledger primitive,
-process-crash/concurrent-writer tests, plain-file bypass helper, finite ladder
-model, and real Debug/ReleaseSafe test entry points.
+Completed locally for this bounded milestone: checked sampler primitives,
+bounded ledger primitive, process-crash/concurrent-writer tests, plain-file
+bypass helper, finite ladder model, and real Debug/ReleaseSafe test entry points.
+`src/monitor/monitor.zig` adds an observe-only host monitor API: nonblocking
+single-owner `flock`, a monotonic due schedule, limit+probe reads, explicit
+invalid/stale observations, `/sys/block` discovery restricted to whole entries
+with a `device` link, stable `(name, major:minor)` comparison, and per-session
+PID/start-time, VmRSS, transcript-size/motion observations. It has no signal,
+write-to-process, LMDB, hook, or pressure-injection path. Per-session callers
+must supply a previously captured `ProcessIdentity`; a PID alone is not treated
+as identity.
+
+Fixture/test evidence: the monitor's lock contention/release, exact read limit,
+synthetic `/sys/block` selection, monotonic schedule, host delta/baseline/device
+replacement, explicit stale/invalid cases, and PID-reuse/RSS/motion behavior are
+tested. These tests do *not* establish correct observations on every live kernel,
+filesystem or storage topology. The sysfs `device`-link filter is a conservative
+selection heuristic, not proof that unusual stacked devices never overlap.
 
 Still required before closure:
 
-* Live single-monitor ownership and bounded /proc reads on a monotonic schedule.
-* Per-session process identity (including PID reuse), RSS and motion observation.
-* Trusted whole-device selection; use `diskBusyPercent` rather than summing all
-  diskstats rows. The legacy raw parser/reducer remains for fixtures and must
-  not be mistaken for the checked monitor boundary.
-* Session startup autoconnection, versioned record schema, heartbeat/retention
-  policy, retry deduplication, and bounded IPC/backpressure.
+* A paired foreground `/proc` + `/sys` sample now passed on this sandbox host
+  after fixing sub-millisecond monotonic interval handling. Validate paired
+  freshness/accuracy on additional supported hosts and representative storage
+  topologies. There is no daemonized/autostart service or managed
+  session-enumeration loop.
+* Session startup/autoconnection, authenticated identity capture, versioned
+  record schema, heartbeat/retention policy, retry deduplication, and bounded
+  IPC/backpressure.
 * End-to-end OFF rechecks while waits/storage are stalled; real hook integration.
 * Isolated resource-pressure acceptance run, realistic disk-full/I/O-failure
   injection, and explicitly scoped host/VM crash-durability evidence.

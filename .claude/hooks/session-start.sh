@@ -2,23 +2,35 @@
 # SPDX-License-Identifier: MPL-2.0
 # SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
-# SessionStart hook for Claude Code on the web. Best-effort and idempotent:
-# ensures the lint/compliance tools this repo's checks rely on are present so
-# a fresh session can run scripts/check-*.sh and `reuse lint` without manual
-# setup.
-#
-# Installs ONLY via standard package managers (pip / apt / gem) — there is
-# deliberately no piped remote script (no `curl ... | bash`). Never blocks a
-# session: each step is guarded by a `command -v` probe and trails `|| true`.
+# Read-only SessionStart preflight. Never installs tools, changes repo state,
+# or blocks the assistant from starting; missing requirements are reported.
 set -u
 
 note() { printf '[session-start] %s\n' "$*"; }
+have() { command -v "$1" >/dev/null 2>&1; }
 
-command -v reuse       >/dev/null 2>&1 || { note "installing reuse (pip)";       pip install --quiet reuse        >/dev/null 2>&1 || true; }
-command -v shellcheck  >/dev/null 2>&1 || { note "installing shellcheck (apt)";  apt-get install -y shellcheck    >/dev/null 2>&1 || true; }
-command -v asciidoctor >/dev/null 2>&1 || { note "installing asciidoctor (gem)"; gem install --silent asciidoctor >/dev/null 2>&1 || true; }
-
-have() { command -v "$1" >/dev/null 2>&1 && echo y || echo n; }
-note "tooling present: reuse=$(have reuse) shellcheck=$(have shellcheck) asciidoctor=$(have asciidoctor)"
-note "(the 'just' task runner is not auto-installed here; add it manually if you want recipe shortcuts)"
+note "llm-grace is development scaffolding; no monitor daemon or enforcement hooks are installed."
+for tool in git bash; do
+    if have "$tool"; then
+        note "available: $tool ($(command -v "$tool"))"
+    else
+        note "missing optional/preflight tool: $tool"
+    fi
+done
+if have zig; then
+    version="$(zig version 2>/dev/null || true)"
+    if [[ "$version" == 0.15.2 ]]; then
+        note "available: Zig $version"
+    else
+        note "Zig version mismatch: expected 0.15.2, found ${version:-unavailable}"
+    fi
+else
+    note "Zig 0.15.2 is required to run core tests; no installation attempted."
+fi
+if have just; then
+    note "available: $(just --version)"
+else
+    note "just is optional; scripts/run.sh provides the shell entrypoint."
+fi
+note "Read CLAUDE.md and docs/practice/AI-CONVENTIONS.adoc before editing."
 exit 0

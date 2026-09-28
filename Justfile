@@ -80,53 +80,30 @@ import? "build/just/assess.just"
 # BUILD & COMPILE
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Build the project (debug mode)
+# No root application target exists yet; fail clearly instead of printing fake success.
 build *args:
-    @echo "Building llm_grace (debug)..."
-    # TODO: Replace with your build command
-    # Examples:
-    #   cargo build {{args}}                    # Rust
-    #   mix compile {{args}}                    # Elixir
-    #   zig build {{args}}                      # Zig
-    #   deno task build {{args}}                # Deno/ReScript
-    @echo "Build complete"
+    @bash scripts/dev.sh build {{args}}
 
-# Build in release mode with optimizations
 build-release *args:
-    @echo "Building llm_grace (release)..."
-    # TODO: Replace with your release build command
-    # Examples:
-    #   cargo build --release {{args}}
-    #   MIX_ENV=prod mix compile {{args}}
-    #   zig build -Doptimize=ReleaseFast {{args}}
-    @echo "Release build complete"
+    @bash scripts/dev.sh build-release {{args}}
 
-# Build and watch for changes (requires entr or similar)
 build-watch:
-    @echo "Watching for changes..."
-    # TODO: Customize file patterns for your language
-    # Examples:
-    #   find src -name '*.rs' | entr -c just build
-    #   mix compile --force --warnings-as-errors
-    #   deno task dev
+    @echo "ERROR: no application build/watch target exists yet" >&2
+    @exit 1
 
-# Clean build artifacts [reversible: rebuild with `just build`]
+# Remove only known generated Zig outputs; never remove the tracked build/ source tree.
 clean:
-    @echo "Cleaning..."
-    # TODO: Customize for your build system
-    rm -rf target/ _build/ build/ dist/ out/ obj/ bin/
+    @rm -rf -- .zig-cache zig-out
 
-# Deep clean including caches [reversible: rebuild]
 clean-all: clean
-    rm -rf .cache .tmp
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TEST & QUALITY
-# ═══════════════════════════════════════════════════════════════════════════════
 
 # Run real core tests (LMDB headers/library required; optional LMDB_PREFIX).
-test *args:
-    bash scripts/test-core.sh {{args}}
+test mode="Debug":
+    bash scripts/dev.sh test {{mode}}
+
+# Explicitly build and run the read-only observer; use `-- --once` for one epoch.
+monitor *args:
+    bash scripts/dev.sh monitor {{args}}
 
 # Zig's test runner already reports each named test and its outcome.
 test-verbose:
@@ -141,35 +118,18 @@ e2e:
     @echo "ERROR: live monitor/hook acceptance suite is not implemented (issue #4)" >&2
     @exit 1
 
-# Run aspect tests (cross-cutting concern validation)
+# Run the repository's implemented cross-cutting checks.
 aspect:
-    @echo "Running aspect tests..."
-    # TODO: Replace with your aspect test command. Examples:
-    #   bash tests/aspect_tests.sh           # Shell-based aspect tests
-    #   cargo test --test aspects             # Rust aspect tests
-    # Aspect tests validate architectural invariants:
-    #   - Thread safety (mutex in FFI modules)
-    #   - ABI/FFI contract (declarations match exports)
-    #   - SPDX compliance (all files have license headers)
-    #   - No dangerous patterns (believe_me, assert_total, etc.)
-    @echo "Aspect tests passed!"
+    bash tests/aspect_tests.sh
 
-# Run benchmarks (performance regression detection)
+# No benchmark suite is implemented; do not claim benchmark success.
 bench:
-    @echo "Running benchmarks..."
-    # TODO: Replace with your benchmark command. Examples:
-    #   cargo bench                           # Rust criterion
-    #   zig build bench                       # Zig benchmarks
-    #   mix run bench/benchmarks.exs          # Elixir benchee
-    #   deno bench                            # Deno bench
-    @echo "Benchmarks complete!"
+    @echo "ERROR: no reproducible benchmark suite is implemented" >&2
+    @exit 1
 
-# Run readiness tests (Component Readiness Grade: D/C/B)
+# Run the structural template validator; this is not a release certification.
 readiness:
-    @echo "Running readiness tests..."
-    # TODO: Replace with your readiness test command. Examples:
-    #   cargo test --test readiness -- --nocapture
-    @echo "Readiness tests complete!"
+    bash scripts/validate-template.sh .
 
 # Print the current CRG grade (reads from READINESS.md '**Current Grade:** X' line)
 crg-grade:
@@ -193,14 +153,16 @@ crg-badge:
     esac; \
     echo "[![CRG $$grade](https://img.shields.io/badge/CRG-$$grade-$$color?style=flat-square)](https://github.com/hyperpolymath/standards/tree/main/component-readiness-grades)"
 
-# Run the full merge-requirement test suite (ALL categories)
-# Per STANDING rule: P2P + E2E + aspect + execution + lifecycle + bench
-test-all: test e2e aspect bench readiness
-    @echo "All test categories passed — safe to merge!"
+# Run currently implemented local suites. E2E/pressure acceptance remains a separate open gate.
+test-all: test aspect lint validate-state
 
-# Run all quality checks
-quality: fmt-check lint test
-    @echo "All quality checks passed!"
+# Run implemented fast structural, syntax, workflow, and formatting checks.
+check:
+    bash scripts/dev.sh check
+
+# Run all implemented quality checks (core tests require LMDB).
+quality: fmt-check lint aspect test
+    @echo "Configured local quality checks passed; consult compliance review for remaining release/security gates."
 
 # Fix all auto-fixable issues [reversible: git checkout]
 fix: fmt
@@ -210,66 +172,39 @@ fix: fmt
 # LINT & FORMAT
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Format all source files [reversible: git checkout]
+# Format Zig source files only.
 fmt:
-    @echo "Formatting source files..."
-    # TODO: Replace with your formatter
-    # Examples:
-    #   cargo fmt
-    #   mix format
-    #   gleam format
-    #   deno fmt
+    zig fmt src/signal src/control src/ledger src/monitor
 
-# Check formatting without changes
+# Check formatting without changing files.
 fmt-check:
-    @echo "Checking formatting..."
-    # TODO: Replace with your format check
-    # Examples:
-    #   cargo fmt --check
-    #   mix format --check-formatted
-    #   gleam format --check
+    zig fmt --check src/signal src/control src/ledger src/monitor
 
-# Run linter
+# Shell syntax plus workflow/compliance regression checks (not a full static analysis suite).
 lint:
-    @echo "Linting source files..."
-    # TODO: Replace with your linter
-    # Examples:
-    #   cargo clippy -- -D warnings
-    #   mix credo --strict
-    #   gleam check
+    bash scripts/dev.sh lint
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # RUN & EXECUTE
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Run the application
-run *args: build
-    # TODO: Replace with your run command
-    echo "Run not configured yet"
+# There is no app or daemon binary to launch or install yet.
+run *args:
+    @bash scripts/dev.sh run {{args}}
 
-# Run with verbose output
-run-verbose *args: build
-    # TODO: Replace with verbose run command
-    echo "Run not configured yet"
+run-verbose *args:
+    @bash scripts/dev.sh run-verbose {{args}}
 
-# Install to user path
-install: build-release
-    @echo "Installing llm_grace..."
-    # TODO: Replace with your install command
+install:
+    @bash scripts/dev.sh install
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCIES
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Install/check all dependencies
+# Check required tools without installing anything.
 deps:
-    @echo "Checking dependencies..."
-    # TODO: Replace with your dependency check
-    # Examples:
-    #   cargo check
-    #   mix deps.get
-    #   gleam deps download
-    @echo "All dependencies satisfied"
+    bash scripts/dev.sh doctor
 
 # Audit dependencies for vulnerabilities
 deps-audit:
@@ -490,7 +425,6 @@ container-run *args:
 
 # Run full CI pipeline locally
 ci: deps quality
-    @echo "CI pipeline complete!"
 
 # Install git hooks
 install-hooks:
@@ -515,8 +449,9 @@ security: deps-audit
 
 # Generate SBOM
 sbom:
+    @command -v syft >/dev/null || { echo "ERROR: syft is required to generate an SBOM" >&2; exit 1; }
     @mkdir -p docs/security
-    @command -v syft >/dev/null && syft . -o spdx-json > docs/security/sbom.spdx.json || echo "syft not found"
+    syft . -o spdx-json > docs/security/sbom.spdx.json
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # VALIDATION & COMPLIANCE — see build/just/validate.just
@@ -661,15 +596,9 @@ assail:
     panic-attack assail .
 
 
-# Self-diagnostic — checks dependencies, permissions, paths
+# Report toolchain readiness without installing packages.
 doctor:
-    @echo "Running diagnostics for {{project}}..."
-    @echo "Checking required tools..."
-    @command -v just >/dev/null 2>&1 && echo "  [OK] just" || echo "  [FAIL] just not found"
-    @command -v git >/dev/null 2>&1 && echo "  [OK] git" || echo "  [FAIL] git not found"
-    @echo "Checking for hardcoded paths..."
-    @grep -rn '$HOME\|$ECLIPSE_DIR' --include='*.rs' --include='*.ex' --include='*.res' --include='*.gleam' --include='*.sh' . 2>/dev/null | head -5 || echo "  [OK] No hardcoded paths"
-    @echo "Diagnostics complete."
+    bash scripts/dev.sh doctor
 
 # Guided tour of key features
 tour:

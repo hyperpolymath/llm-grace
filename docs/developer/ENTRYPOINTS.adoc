@@ -1,0 +1,75 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Developer Entry Points
+:toc:
+
+== Shell and Just
+
+`scripts/run.sh` is the stable shell-facing dispatcher. It forwards to
+`scripts/dev.sh`; it does not install tools, install hooks, start a background
+process, or write outside the checkout. `scripts/dev.sh help` lists supported
+commands. The common paths are:
+
+[source,shell]
+----
+scripts/run.sh check
+scripts/run.sh test Debug
+scripts/run.sh test ReleaseSafe
+scripts/run.sh observe --once
+scripts/run.sh doctor
+just --list
+just check
+just test Debug
+just test ReleaseSafe
+just monitor -- --once
+----
+
+`just` is the preferred recipe interface; the shell dispatcher provides a
+minimal alternative for hosts without Just. Both paths call the same test and
+validation scripts. `just build`, `just run`, and `just install` fail explicitly:
+there is no root application target or service binary. `just clean` only removes
+`.zig-cache/` and `zig-out/`; it never removes tracked `build/` sources.
+
+`just monitor -- --once` builds and invokes the foreground JSONL observer once;
+`--count N --interval-seconds S` performs a bounded number of samples. With no
+count it remains foreground until interrupted. It needs a user-private
+`XDG_RUNTIME_DIR` for its single-instance lock, reads host proc/sys facts only,
+and reports the first sample as `invalid:missing` (no delta baseline). It does
+not enumerate sessions or auto-start.
+
+`just check` runs implemented repository, shell-syntax, workflow/compliance,
+and Zig-format checks. `just test MODE` runs Debug or ReleaseSafe core tests.
+`just quality` also runs the aspect checks; it reports the existing SPDX gap as
+an owner-only warning rather than rewriting licensing metadata. These are local
+checks, not security certification or release approval. The benchmark and
+end-to-end acceptance recipes fail explicitly while those suites are
+unimplemented.
+
+== AI-Assisted Development
+
+`0-AI-MANIFEST.a2ml` is the allocation/policy manifest. `docs/practice/AI-CONVENTIONS.adoc`
+is the shared human-readable convention. Claude Code's `CLAUDE.md`, Gemini's
+`GEMINI.md`, and `.github/copilot-instructions.md` point to those shared rules
+rather than maintaining conflicting copies. The Claude SessionStart hook is a
+read-only tool preflight: it does not install packages or block startup.
+
+Do not put credentials, private prompts, process environments, or ledger
+records into an assistant. Preserve issue #2's owner-only licensing boundary.
+
+== Application Launcher Boundary
+
+`scripts/run.sh` is a developer command entrypoint, **not a compliant desktop
+or service launcher**. The foreground host observer is a diagnostics command,
+not an application runtime. The launcher standard defines service lifecycle,
+user integration, GUI fallback, and installation modes that cannot honestly be
+implemented until this repository has an application service. Its `--version`,
+help, status, and no-op stop responses are informational only; start/auto/
+integration requests fail explicitly and do not install or signal anything. Do not create desktop
+shortcuts or enable an autostart service from this scaffolding.
+
+When a real application exists, implement and validate the complete current
+https://github.com/hyperpolymath/standards/blob/main/docs/UX-standards/launcher-standard.adoc[launcher standard]
+and its authoritative
+https://github.com/hyperpolymath/standards/blob/main/launcher/launcher-standard_praxis.deed[Praxis DEED]
+by reference before claiming launcher compliance. In particular, do not copy an
+old launcher template or reimplement the resolution and keep-open ladders from
+memory.
