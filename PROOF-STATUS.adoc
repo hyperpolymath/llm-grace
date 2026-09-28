@@ -98,3 +98,11 @@ panic-attack assail --proofs-only
 
 | 2026-04-04 | Initial proof status tracking | Template
 |===
+
+== Core Ledger and Control Review (2026-09-28)
+
+No new formal proofs are claimed. The finite control model now has exhaustive
+state/event tests in `src/control/ladder.zig`; ledger process-crash tests and
+checked sampler fixtures are executable evidence, not Lean/Agda/Idris proofs.
+See `docs/decisions/0006-ledger-and-proof-boundaries.adoc` for concrete proof
+targets and scoped applications of the owner's type-theory repositories.

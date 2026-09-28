@@ -124,36 +124,22 @@ clean-all: clean
 # TEST & QUALITY
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Run all tests
+# Run real core tests (LMDB headers/library required; optional LMDB_PREFIX).
 test *args:
-    @echo "Running tests..."
-    # TODO: Replace with your test command
-    # Examples:
-    #   cargo test {{args}}
-    #   mix test {{args}}
-    #   zig build test {{args}}
-    #   deno test {{args}}
-    @echo "Tests passed!"
+    bash scripts/test-core.sh {{args}}
 
-# Run tests with verbose output
+# Zig's test runner already reports each named test and its outcome.
 test-verbose:
-    @echo "Running tests (verbose)..."
-    # TODO: Replace with verbose test command
+    just test
 
-# Smoke test
+# Pure signal smoke test (no LMDB required).
 test-smoke:
-    @echo "Smoke test..."
-    # TODO: Add basic sanity checks
+    zig test src/signal/sampler.zig
 
-# Run end-to-end tests (full pipeline: build → run → verify)
+# End-to-end monitor/hook tests are not implemented; never report fake success.
 e2e:
-    @echo "Running E2E tests..."
-    # TODO: Replace with your E2E test command. Examples:
-    #   bash tests/e2e.sh                    # Shell-based E2E
-    #   npx playwright test                  # Browser E2E
-    #   mix test test/integration/e2e_test.exs  # Elixir E2E
-    #   cargo test --test end_to_end         # Rust E2E
-    @echo "E2E tests passed!"
+    @echo "ERROR: live monitor/hook acceptance suite is not implemented (issue #4)" >&2
+    @exit 1
 
 # Run aspect tests (cross-cutting concern validation)
 aspect:
@@ -287,14 +273,9 @@ deps:
 
 # Audit dependencies for vulnerabilities
 deps-audit:
-    @echo "Auditing for vulnerabilities..."
-    # TODO: Replace with your audit command
-    # Examples:
-    #   cargo audit
-    #   mix audit
-    @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL --quiet . || true
-    @command -v gitleaks >/dev/null && gitleaks detect --source . --no-git --quiet || true
-    @echo "Audit complete"
+    @command -v trivy >/dev/null || { echo "ERROR: trivy is required" >&2; exit 1; }
+    trivy fs --severity HIGH,CRITICAL --exit-code 1 .
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DOCUMENTATION
@@ -529,10 +510,8 @@ install-hooks:
 
 # Run security audit
 security: deps-audit
-    @echo "=== Security Audit ==="
-    @command -v gitleaks >/dev/null && gitleaks detect --source . --verbose || true
-    @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL . || true
-    @echo "Security audit complete"
+    @command -v gitleaks >/dev/null || { echo "ERROR: gitleaks is required" >&2; exit 1; }
+    gitleaks detect --source . --redact
 
 # Generate SBOM
 sbom:
@@ -678,7 +657,8 @@ maint-assault:
 
 # Run panic-attacker pre-commit scan (foundational floor-raise requirement)
 assail:
-    @command -v panic-attack >/dev/null 2>&1 && panic-attack assail . || echo "WARN: panic-attack not found — install from https://github.com/hyperpolymath/panic-attacker"
+    @command -v panic-attack >/dev/null 2>&1 || { echo "ERROR: panic-attack is required" >&2; exit 1; }
+    panic-attack assail .
 
 
 # Self-diagnostic — checks dependencies, permissions, paths

@@ -78,3 +78,6 @@ container/                 # may host Containerfile if not at build/
 .gitlab-ci.yml             # TODO: relocate to ci/.gitlab-ci.yml after GitLab project-setting update
 .pre-commit-config.yaml    # TODO: relocate to ci/.pre-commit-config.yaml after invocation pattern decided
 tools/                     # TODO: consolidate with scripts/ or document the split (pending decision)
+
+# Local Zig test/build cache; ignored by Git, created by `just test`.
+.zig-cache/

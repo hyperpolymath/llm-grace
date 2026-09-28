@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= LMDB Ledger Primitive
+
+This is a bounded transactional building block for issue #4, not a production
+session coordinator. See
+link:../../docs/decisions/0006-ledger-and-proof-boundaries.adoc[ADR-0006] for
+contracts, concurrency preconditions, durability limitations, and remaining work.
+
+== Tests
+
+Zig 0.15.2 and LMDB development headers/library are required. Use system LMDB:
+
+[source,shell]
+----
+just test
+just test -O ReleaseSafe
+----
+
+Or point to an independently installed prefix containing `include/lmdb.h` and
+`lib/liblmdb.a`:
+
+[source,shell]
+----
+LMDB_PREFIX=/path/to/lmdb-prefix just test
+----
+
+The sandbox review used upstream LMDB 0.9.33, commit
+`3a29a24777c82a0165de813ae696a5068b5add30`. CI uses the Ubuntu development package;
+toolchain/database differences should be recorded when comparing test evidence.
+No LMDB source or binary is vendored here.
+
+The tests create disposable directories, write only their test data, fork their
+own child writers, and kill only those children. They do not induce memory
+pressure or terminate user sessions. Each suite has an external timeout.
+A process-kill test does not establish power-loss or VM-crash durability.

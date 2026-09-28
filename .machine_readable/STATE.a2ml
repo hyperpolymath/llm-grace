@@ -2,26 +2,22 @@
 ;; Project state — update throughout each session
 (state
   (metadata
-    (version "1.0.1")
-    (project "rsr-template-repo")
-    (last-updated "2026-04-04"))
+    (version "1.0.2")
+    (project "llm-grace")
+    (last-updated "2026-09-28"))
   (project-context
-    (description "RSR Standard Repository Template — baseline for all hyperpolymath projects")
+    (description "Graceful degradation for concurrent LLM/agent terminals")
     (primary-language "Idris2 (ABI) + Zig (FFI)")
-    (status "testing-complete"))
+    (status "development; release readiness not established"))
   (current-position
-    (phase "testing")
-    (completion-percentage 100)
-    (milestone "CRG C - Testing & Benchmarking complete"))
+    (phase "implementation-and-validation")
+    (milestone "Issue #4: ledger and checked sampler primitives implemented; monitor integration pending"))
   (testing-summary
-    (validation-script "scripts/validate-template.sh: PASS (0 errors)")
-    (workflow-tests "tests/workflows/validate_workflows_test.sh: PASS (21/21 workflows)")
-    (integration-tests "test/integration_test.zig: PASS (placeholder template)")
-    (e2e-tests "tests/e2e/template_instantiation_test.sh: READY")
-    (benchmarks "benches/template_bench.sh: PASS (5 suites)")
-    (zig-build "Zig 0.15.2 compatible: PASS"))
+    (repository-structure "Local structural checks pass; not a release gate")
+    (compiler-checks "Zig 0.15.2: core sampler/control/ledger tests; Idris2 unavailable; FFI build is scaffolding")
+    (security-scans "Not run in compliance audit: scanners unavailable")
+    (compliance-review "docs/governance/COMPLIANCE-REVIEW.adoc"))
   (critical-next-actions
-    ("Commit test suite"
-     "Push to GitHub"
-     "Verify CI workflows pass"
-     "Document test instantiation patterns")))
+    ("Owner reconcile issue #2, ADR-0005 and draft REUSE.toml without automated relicensing"
+     "Run compiler, integration and security gates with required toolchains"
+     "Verify hosted governance and branch protection before release")))
