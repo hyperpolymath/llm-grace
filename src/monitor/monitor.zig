@@ -517,6 +517,14 @@ test "single-instance lock excludes another owner and releases on close" {
     const symlink_path = try std.fmt.allocPrintSentinel(std.testing.allocator, "{s}/monitor-link", .{path}, 0);
     defer std.testing.allocator.free(symlink_path);
     try std.testing.expectError(error.LockOpenFailed, Ownership.acquire(symlink_path.ptr));
+
+    const unsafe_path = try std.fmt.allocPrintSentinel(std.testing.allocator, "{s}/unsafe.lock", .{path}, 0);
+    defer std.testing.allocator.free(unsafe_path);
+    const unsafe_fd = c.open(unsafe_path.ptr, c.O_CREAT | c.O_RDWR | c.O_CLOEXEC, @as(c_uint, 0o600));
+    try std.testing.expect(unsafe_fd >= 0);
+    defer _ = c.close(unsafe_fd);
+    try std.testing.expectEqual(@as(c_int, 0), c.fchmod(unsafe_fd, 0o644));
+    try std.testing.expectError(error.UntrustedLockFile, Ownership.acquire(unsafe_path.ptr));
 }
 
 test "stable selection excludes partitions and virtual devices, catches identity changes" {
