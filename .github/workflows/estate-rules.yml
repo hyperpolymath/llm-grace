@@ -45,3 +45,33 @@ jobs:
 
       - name: Neutral template (no project identifiers)
         run: bash scripts/check-no-project-identifiers.sh .
+
+      - name: State required fields
+        run: bash scripts/check-state.sh
+
+      - name: Required workflow capabilities
+        run: bash tests/workflows/validate_workflows_test.sh
+
+      - name: Compliance guardrail regression tests
+        run: bash tests/workflows/compliance_regression_test.sh
+
+  core-tests:
+    name: Zig core and LMDB crash tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+      - name: Install LMDB and pinned Zig distribution
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes liblmdb-dev python3-venv
+          python3 -m venv "$RUNNER_TEMP/grace-tools"
+          "$RUNNER_TEMP/grace-tools/bin/pip" install ziglang==0.15.2
+          ZIG_PATH=$("$RUNNER_TEMP/grace-tools/bin/python" -c 'import pathlib, ziglang; print(pathlib.Path(ziglang.__file__).parent / "zig")')
+          ln -s "$ZIG_PATH" "$RUNNER_TEMP/grace-tools/bin/zig"
+          echo "$RUNNER_TEMP/grace-tools/bin" >> "$GITHUB_PATH"
+      - name: Run bounded core tests
+        run: bash scripts/test-core.sh
+      - name: Run optimized core tests
+        run: bash scripts/test-core.sh -O ReleaseSafe

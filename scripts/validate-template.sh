@@ -8,7 +8,7 @@
 # Exit codes:
 #   0 = validation passed
 #   1 = validation failed with errors
-#   2 = validation failed with warnings (but can proceed)
+#   Warnings are reported separately; they do not establish build readiness.
 
 set -euo pipefail
 
@@ -51,7 +51,7 @@ check_file_exists() {
         return 0
     else
         log_error "Required file missing: $file ${description:+(${description})}"
-        return 1
+        return 0
     fi
 }
 
@@ -63,7 +63,7 @@ check_dir_exists() {
         return 0
     else
         log_error "Required directory missing: $dir ${description:+(${description})}"
-        return 1
+        return 0
     fi
 }
 
@@ -101,7 +101,7 @@ check_file_exists "AUDIT.adoc" "Release audit gate"
 # Directories
 check_dir_exists ".machine_readable" "Machine-readable metadata"
 check_dir_exists ".github" "GitHub community metadata"
-check_dir_exists "src/interface/abi" "Idris2 ABI definitions"
+check_dir_exists "src/interface/Abi" "Idris2 ABI definitions"
 check_dir_exists "src/interface/ffi" "Zig FFI implementation"
 check_dir_exists "src/interface/generated/abi" "Generated C headers"
 check_dir_exists "docs" "Documentation"
@@ -119,9 +119,15 @@ check_file_exists ".machine_readable/META.a2ml" "Architecture decisions"
 check_file_exists ".machine_readable/ECOSYSTEM.a2ml" "Ecosystem position"
 check_file_exists ".machine_readable/anchors/ANCHOR.a2ml" "Semantic boundary anchor"
 check_file_exists ".machine_readable/policies/MAINTENANCE-AXES.a2ml" "Maintenance axes"
+check_file_exists ".machine_readable/policies/MAINTENANCE-CHECKLIST.a2ml" "Maintenance checklist"
+check_file_exists ".machine_readable/policies/SOFTWARE-DEVELOPMENT-APPROACH.a2ml" "Development approach"
+check_file_exists "docs/governance/MAINTENANCE-CHECKLIST.adoc" "Human maintenance checklist"
+check_file_exists "docs/governance/SOFTWARE-DEVELOPMENT-APPROACH.adoc" "Human development approach"
+check_file_exists "LICENSES/MPL-2.0.txt" "Declared project license text (no relicensing)"
+
 
 #==============================================================================
-# VALIDATION PHASE 3: REQUIRED WORKFLOWS (17 minimum)
+# VALIDATION PHASE 3: REQUIRED WORKFLOW CAPABILITIES
 #==============================================================================
 
 echo ""
@@ -129,19 +135,11 @@ log_info "Phase 3: GitHub Actions workflows"
 echo ""
 
 REQUIRED_WORKFLOWS=(
+    "governance.yml"
+    "estate-rules.yml"
     "hypatia-scan.yml"
     "codeql.yml"
     "scorecard.yml"
-    "quality.yml"
-    "mirror.yml"
-    "instant-sync.yml"
-    "guix-nix-policy.yml"
-    "rsr-antipattern.yml"
-    "security-policy.yml"
-    "wellknown-enforcement.yml"
-    "workflow-linter.yml"
-    "npm-bun-blocker.yml"
-    "ts-blocker.yml"
     "scorecard-enforcer.yml"
     "secret-scanner.yml"
 )
@@ -159,11 +157,7 @@ done
 WORKFLOW_FILES=$(find "$REPO_ROOT/.github/workflows" -name "*.yml" -type f 2>/dev/null || true)
 WORKFLOW_COUNT=$(echo "$WORKFLOW_FILES" | grep -c "." || true)
 
-if [ "$WORKFLOW_COUNT" -ge 15 ]; then
-    log_pass "Found $WORKFLOW_COUNT workflows (>= 15 expected)"
-else
-    log_warning "Found only $WORKFLOW_COUNT workflows (expected >= 15)"
-fi
+log_info "Found $WORKFLOW_COUNT workflows; required capabilities checked above"
 
 # Spot-check workflow files for issues
 while IFS= read -r workflow_file; do
@@ -189,9 +183,9 @@ log_info "Phase 4: Idris2 ABI and Zig FFI source files"
 echo ""
 
 # Idris2 ABI files
-check_file_exists "src/interface/abi/Types.idr" "Core type definitions"
-check_file_exists "src/interface/abi/Layout.idr" "Memory layout specifications"
-check_file_exists "src/interface/abi/Foreign.idr" "FFI foreign declarations"
+check_file_exists "src/interface/Abi/Types.idr" "Core type definitions"
+check_file_exists "src/interface/Abi/Layout.idr" "Memory layout specifications"
+check_file_exists "src/interface/Abi/Foreign.idr" "FFI foreign declarations"
 
 # Zig FFI files
 check_file_exists "src/interface/ffi/build.zig" "Zig build configuration"
@@ -263,13 +257,11 @@ echo ""
 # Check Zig build
 if [ -f "$REPO_ROOT/src/interface/ffi/build.zig" ]; then
     if command -v zig &> /dev/null; then
-        cd "$REPO_ROOT/src/interface/ffi"
-        if zig build 2>&1 | grep -q "error"; then
-            log_error "Zig build failed"
-        else
+        if (cd "$REPO_ROOT/src/interface/ffi" && zig build); then
             log_pass "Zig build successful"
+        else
+            log_error "Zig build failed"
         fi
-        cd - > /dev/null
     else
         log_warning "Zig compiler not found - skipping Zig build check"
     fi
@@ -279,13 +271,13 @@ fi
 
 # Check Idris2 syntax (if available)
 if command -v idris2 &> /dev/null; then
-    IDS_FILES=$(find "$REPO_ROOT/src/interface/abi" -name "*.idr" -type f 2>/dev/null || true)
+    IDS_FILES=$(find "$REPO_ROOT/src/interface/Abi" -name "*.idr" -type f 2>/dev/null || true)
     while IFS= read -r ids_file; do
         if [ -z "$ids_file" ]; then continue; fi
-        if ! idris2 --check "$ids_file" 2>&1 | grep -q "Error"; then
+        if idris2 --check "$ids_file"; then
             log_pass "Idris2 syntax OK: $(basename "$ids_file")"
         else
-            log_warning "Idris2 syntax issue: $(basename "$ids_file")"
+            log_error "Idris2 syntax issue: $(basename "$ids_file")"
         fi
     done <<< "$IDS_FILES"
 else

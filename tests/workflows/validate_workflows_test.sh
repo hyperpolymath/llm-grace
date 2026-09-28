@@ -89,19 +89,11 @@ log_info "Checking for required workflows"
 echo ""
 
 REQUIRED_WORKFLOWS=(
+    "governance.yml"
+    "estate-rules.yml"
     "hypatia-scan.yml"
     "codeql.yml"
     "scorecard.yml"
-    "quality.yml"
-    "mirror.yml"
-    "instant-sync.yml"
-    "guix-nix-policy.yml"
-    "rsr-antipattern.yml"
-    "security-policy.yml"
-    "wellknown-enforcement.yml"
-    "workflow-linter.yml"
-    "npm-bun-blocker.yml"
-    "ts-blocker.yml"
     "scorecard-enforcer.yml"
     "secret-scanner.yml"
 )
@@ -112,8 +104,7 @@ for required in "${REQUIRED_WORKFLOWS[@]}"; do
         log_pass "Found: $required"
         FOUND_COUNT=$((FOUND_COUNT + 1))
     else
-        log_warning "Missing: $required"
-        WARNINGS=$((WARNINGS + 1))
+        log_error "Missing: $required"
     fi
 done
 

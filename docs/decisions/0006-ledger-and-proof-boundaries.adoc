@@ -1,0 +1,143 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= ADR-0006: Retain LMDB; make evidence and failure boundaries explicit
+:status: ACCEPTED FOR IMPLEMENTATION
+:revdate: 2026-09-28
+
+== Decision
+
+Retain the LMDB choice in ADR-0003 for issue #4. The owner agreed to retaining
+LMDB rather than switching to CubDB. This review found no new requirement that
+justifies a different database. This is a fit decision, not a comparative
+benchmark or a claim that LMDB cannot fail.
+
+SQLite is the strongest fallback candidate if schema/query needs or integration
+complexity change. It merits a prototype if those needs arise; it does not
+remove the need to configure durability, bound contention, handle full storage,
+or test recovery. Do not build a second backend speculatively.
+
+CubDB remains reasonable for an intentionally Elixir/OTP-based coordinator.
+Its single owning instance per directory would require a service boundary for
+our independent Zig clients. That is an architecture change, not a transparent
+replacement for a multi-process LMDB environment. No database can recover work
+that was never captured, or guarantee a finite storage-operation latency under
+an unresponsive kernel/device.
+
+== Implemented Boundary
+
+`src/ledger/lmdb.zig` is a primitive, not the full coordinator:
+
+* Three named stores: latest session records, ordered immutable events, metadata.
+* Schema marker `1`; unsupported versions are rejected, not silently migrated.
+* Record <= 4096 bytes; nonempty session identifier <= 128 bytes.
+* One write transaction updates the session, event, and monotone sequence.
+* Events carry a supplied wall-clock timestamp; order uses the sequence, not
+  the wall clock. The caller must supply correct session identity and content.
+* Default-sync commits with no relaxed durability or writable-map flags.
+* Fixed map size, explicit map-full/disk-full failures, no automatic growth.
+* Reads copy data before ending the read transaction; no mmap pointer escapes.
+
+Deployment preconditions: trusted private directory, local storage, restricted
+file access, one environment per process/path, no inherited live environment
+after fork, no concurrent close against users. LMDB files use mode 0600 when
+created; this does not fix permissions on pre-existing files or parent paths.
+
+Writer-lock acquisition and fsync are not bounded-time operations. Hooks must
+not call this primitive synchronously. The future coordinator/IPC boundary must
+provide bounded waits and backpressure; a timeout means *outcome unknown*, not
+"the commit did not happen". Retried commands will need stable idempotency keys.
+The current append primitive does not deduplicate retries.
+
+`src/control/safety.zig` checks the plain OFF entry without touching LMDB. Any
+entry, including a dangling symlink, disables enforcement. Unexpected stat
+errors also disable enforcement. Call it before entering IPC/ledger operations;
+a future wait loop must recheck it rather than only checking once at startup.
+
+`src/control/ladder.zig` is a pure finite policy kernel, with exhaustive finite
+transition tests. It does not send signals or authenticate events. A caller must
+only emit `checkpoint_committed` after its session checkpoint transaction really
+succeeds. Recovery resumes PAUSE, not CHECKPOINT; TERMINATED is absorbing; OFF
+bypasses enforcement without erasing a recorded latch.
+
+== Mathematical Help from the Owner's Type Repositories
+
+These are source-review findings and proposed applications, not imported proofs.
+No Lean/Agda library has been vendored, executed, or connected to the Zig code.
+Pinned inspected revisions:
+
+[cols="1,2,3",options="header"]
+|===
+|Repository |Revision |Useful boundary
+|https://github.com/hyperpolymath/tropical-types[tropical-types]
+|`9a5c34f20aba2589d44e8b1bbf32540551ffa395`
+|Max-plus resource algebra: sequential latency budgets add; alternative-path
+budgets take max. Use additive grades for simultaneously retained memory.
+Do not use max to undercount concurrent memory demand.
+
+|https://github.com/hyperpolymath/epistemic-types[epistemic-types]
+|`d97ecaab042ce3b793e151dbead43f9ffb9b88d7`
+|Distinguish observations, hypotheses, commit receipts and justified claims.
+Its store-history/read-consistency model is especially relevant: relabelling
+an old sample with a new timestamp cannot make it current evidence.
+
+|https://github.com/hyperpolymath/echo-types[echo-types]
+|`39a7a99cbe19a918843e9624010510b5fc3b8366`
+|Model checkpoint projection and information loss. If two full states produce
+the same checkpoint, a general exact-recovery function is not justified.
+A fiber witness is not free compression or recovery of uncaptured RAM.
+
+|https://github.com/hyperpolymath/residual-evidence-types[residual-evidence-types]
+|`eb01e18a384f34489fbb14907b19bc4a7b4675bd`
+|Research direction for retaining bounded uncertainty after partial observations.
+Its narrow checked core is not a ready-made crash-recovery proof.
+
+|https://github.com/hyperpolymath/choreographic-types[choreographic-types]
+|`8ab0d8f540581498d551d482bad68f0eeaaa2a04`
+|Potential future model for multi-session protocol consistency. Its README calls
+K-CUT OPEN and says the general formalisation is not complete. Do not rely on
+repository metadata suggesting otherwise.
+
+|https://github.com/hyperpolymath/occupancy-types[occupancy-types]
+|`5fe6f8676caeb8396996c6d130a2a6fcda5bb336`
+|The inspected README is still a scaffold. No applicable result was established
+by this review; do not infer one from the repository name.
+|===
+
+== Concrete Proof Targets, Not Yet Discharged
+
+. *Policy safety*: checkpoint cannot auto-resume, termination requires a prior
+  acknowledged checkpoint, and terminated sessions cannot be auto-relaunched.
+  Finite transition tests now cover the policy model, but event authenticity,
+  crash interleavings, and correspondence to a controller remain obligations.
+. *Freshness*: successful classification requires valid observations from the
+  intended sample epoch. Missing readings and reset counters are not zeros.
+  The checked sampler rejects these cases; its Raw type is not proof-indexed.
+. *Atomicity*: session record, event and sequence appear together or not at all.
+  Tests exercise LMDB's contract; they are not a mechanised storage-engine proof.
+. *Conditional budget*: if each primitive has a certified bound, compose bounds
+  for a monitor iteration. Unbounded fsync/lock acquisition cannot be assigned
+  an invented finite grade. Isolate them behind a deadline-aware interface.
+. *Checkpoint adequacy*: define exactly which resume facts must be preserved and
+  prove recovery for that projection, rather than claiming full-state recovery.
+
+== Closure Criteria for Issue #4
+
+Completed locally: checked sampler primitives, bounded ledger primitive,
+process-crash/concurrent-writer tests, plain-file bypass helper, finite ladder
+model, and real Debug/ReleaseSafe test entry points.
+
+Still required before closure:
+
+* Live single-monitor ownership and bounded /proc reads on a monotonic schedule.
+* Per-session process identity (including PID reuse), RSS and motion observation.
+* Trusted whole-device selection; use `diskBusyPercent` rather than summing all
+  diskstats rows. The legacy raw parser/reducer remains for fixtures and must
+  not be mistaken for the checked monitor boundary.
+* Session startup autoconnection, versioned record schema, heartbeat/retention
+  policy, retry deduplication, and bounded IPC/backpressure.
+* End-to-end OFF rechecks while waits/storage are stalled; real hook integration.
+* Isolated resource-pressure acceptance run, realistic disk-full/I/O-failure
+  injection, and explicitly scoped host/VM crash-durability evidence.
+
+No system-wide hooks, background monitor, process-killing controller, or memory
+balloon is enabled by these changes. Issue #4 remains open until the above is
+implemented and tested. Issue #2 remains strictly manual owner-only.

@@ -75,3 +75,9 @@ link:docs/decisions/0005-licensing-mpl-now-pmpl-overlay-later.adoc[ADR-0005].
 Scaffolded from `+rsr-template-repo+` (the neutral RSR skeleton). The
 full RSR placeholder bootstrap and the per-file SPDX relicense are
 tracked build sub-issues rather than rushed inline — foundation-first.
+
+== AI-Assisted Installation
+
+There is no production installer yet. For a safe development checkout, see
+link:docs/AI_INSTALLATION_GUIDE.adoc[AI-assisted development setup].
+Local structural checks are not proof of runtime safety or release readiness.

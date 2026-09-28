@@ -9,3 +9,45 @@ assessment within 7 days - Fix or mitigation within 90 days
 
 *Safe harbour:* We will not pursue legal action against security
 researchers who follow responsible disclosure.
+
+
+=== Scope and Supported Versions
+
+llm-grace is development software; no stable-release or historical-version
+support promise is established. Reports against the current development branch
+are welcome. Response timelines above are targets, not guaranteed remediation
+deadlines. No monetary bounty is offered.
+
+Private reporting is also available at
+https://github.com/hyperpolymath/llm-grace/security/advisories/new[GitHub Security Advisories]
+when enabled; use the email address above if it is unavailable.
+Do not publish credentials, private prompts, process environments, or ledger
+contents in public issues. Include the affected commit, minimal reproduction,
+impact, and a redacted diagnostic sample.
+
+=== Safe Research and Deployment
+
+Test only systems and sessions you own or have explicit permission to test.
+Do not load-test shared hosts, terminate unrelated processes, or inspect another
+user's session data. Safe harbour does not extend to third-party infrastructure.
+
+Run memory-balloon and process-signal experiments in an isolated, disposable
+session with resource limits. Do not run the sampler as root or enable global
+process control before the isolation and recovery tests pass. Treat ledger
+files and diagnostic artefacts as potentially sensitive; restrict access and
+redact them before sharing.
+
+=== Contributor Security and Quality Gates
+
+* Never commit credentials or unredacted scanner output.
+* `just security` requires Trivy and Gitleaks and fails on scanner errors or
+  configured findings; a missing scanner is not a clean scan.
+* `just assail` requires panic-attack and propagates its exit status.
+* `just validate` checks repository structure and documentation. It is not
+  evidence that runtime tests, proofs, external governance, or security scans pass.
+* Review CI permissions, external action/tool provenance, dependencies, and
+  changes to process targeting, resource limits, and crash recovery.
+* Follow `AUDIT.adoc` and `READINESS.adoc`; do not infer release readiness from
+  template tests or skipped jobs.
+
+See `docs/governance/COMPLIANCE-REVIEW.adoc` for outstanding audit limitations.

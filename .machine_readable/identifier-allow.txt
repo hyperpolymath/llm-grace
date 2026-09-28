@@ -27,3 +27,7 @@
 .machine_readable/ai/.cursorrules	AffineScript
 .machine_readable/ai/.windsurfrules	AffineScript
 docs/RSR_OUTLINE.adoc	AffineScript
+# Shared label taxonomy and classifier examples, not project identity.
+.github/label-classifier.json	AffineScript
+.github/labels.json	AffineScript
+.github/scripts/classify-issue.jq	AffineScript

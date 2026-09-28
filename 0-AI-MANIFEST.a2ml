@@ -5,7 +5,7 @@
 #
 [metadata]
 version = "0.1.0"
-last-updated = "2026-05-18"
+last-updated = "2026-09-28"
 
 [project]
 name = "llm-grace"
@@ -32,3 +32,14 @@ items = [
   { agent = "GEMINI", task = "estate audits, cross-repo sweeps, long-context triage, pattern detection" },
   { agent = "VIBE", task = "UI/frontend, PanLL panels, ReScript components, theming, rapid prototyping" },
 ]
+
+[compliance-review]
+report = "docs/governance/COMPLIANCE-REVIEW.adoc"
+licensing = "Issue #2 remains owner-manual only; no existing SPDX or license declarations changed"
+status = "Local guardrail repairs; full RSR and release compliance not certified"
+
+[core-implementation]
+issue = "https://github.com/hyperpolymath/llm-grace/issues/4"
+decision = "docs/decisions/0006-ledger-and-proof-boundaries.adoc"
+status = "Tested primitives; no live monitor, session autoconnection, or global deployment"
+proofs = "Finite policy tests only; no new formal proofs claimed"

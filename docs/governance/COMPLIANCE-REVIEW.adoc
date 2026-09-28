@@ -1,0 +1,158 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Licensing, Security and RSR Compliance Review
+:revdate: 2026-09-28
+
+== Scope and Disposition
+
+Repository-local review against issue #2, ADR-0005, `AUDIT.adoc`, the existing
+validation scripts, and the current upstream template overview. This is not a
+full security audit, legal opinion, or certification of RSR/release readiness.
+Upstream `hyperpolymath/rsr-template-repo` was inspected at
+`fcfbac22116053c208bf5f8ff353cbf95e4b2141`; its `docs/RSR_OUTLINE.adoc` explicitly
+warns that older hand-written directory maps are superseded. Do not blindly
+copy its current skeleton or license declarations into this derived project.
+
+== Owner-Only Licensing Decision: Still Open
+
+https://github.com/hyperpolymath/llm-grace/issues/2[Issue #2] prohibits any automated
+SPDX migration, including an agent pass. Its June 2 owner comment reaffirms the
+exclusion from the estate-wide sweep. No existing SPDX headers, copyright
+attributions, `LICENSE`, `LICENSES/`, or `REUSE.toml` were changed in this review.
+Third-party and component declarations are not ours to alter.
+
+The owner must reconcile these records manually:
+
+* Issue #2 still describes approximately 199 PMPL headers needing manual review.
+  A read-only tracked-text search during this review found no SPDX lines matching
+  `PMPL`, `MPL-2.0-or-later`, or `AGPL`. This is not provenance or legal clearance.
+* ADR-0005 says there is no licensing debt and withdraws the previous premise,
+  while preserving the owner-only constraint. It also describes new files as
+  CC-BY-SA-4.0 despite the project-code MPL declaration.
+* `REUSE.toml` is marked DRAFT and asserts broad owner copyright/MPL coverage.
+  Its comment says existing headers are retained, but blanket annotations still
+  need review for interaction with document licenses and other authors' work.
+  Its explicit paths include pre-migration `.md` filenames.
+* Its AGPL carve-out comment for `k9iser-regen.yml` conflicts with the current
+  workflow's MPL header. Flagged only; neither the header nor annotation changed.
+
+Only the owner can determine provenance, correct individual declarations, approve
+REUSE scope, and decide whether to close or retitle issue #2. Do not use a clean
+text search, root license, or this report as authorization to relicense files.
+
+== Repairs Made
+
+* Structural validation now uses this checkout's `src/interface/Abi` casing,
+  current `LICENSES/` layout, and consolidated governance workflow rather than
+  requiring retired per-policy workflows and nonexistent licensing exhibits.
+* Missing structural inputs accumulate in the summary. Compiler exit status,
+  not diagnostic wording, decides success. Workflow presence failures are errors.
+* STATE validation checks the actual S-expression fields and fails for absent or
+  wrong-project state. It does not claim to parse all A2ML syntax. Template claims
+  of 100% completion and completed tests were removed from the project state.
+* Local security recipes propagate failures and reject missing required tools.
+  Trivy has an explicit findings exit code; Gitleaks output is redacted.
+* The GitHub security entry point now links to the canonical AsciiDoc policy,
+  with no invented stable-release/backport promise or unfilled PGP URL.
+* Added development-only AI setup guidance, privacy/isolation precautions, and
+  a README entry point, without pretending there is a production installer.
+* Fixed duplicate YAML `with` keys in Rust CI and the invalid `master` toolchain.
+* Scoped language-name exceptions to label-taxonomy/classifier files, not whole
+  directories. Existing project-subtree and identity guards remain active.
+* Added CI regression tests for missing state/workflows/files and silently
+  failing compilers. These use mock compilers, not runtime integration evidence.
+
+== Verification and Remaining Gates
+
+Local checks performed:
+
+* Root shape and AsciiDoc-default checks: pass.
+* Project-identifier check: pass after narrow taxonomy exceptions.
+* Workflow structure/presence check: 23 workflows, zero errors/warnings.
+* STATE required-field check and compliance failure-path regression tests: pass.
+* Template validator: zero errors, three warnings (Just interpolation detected
+  by the broad placeholder heuristic; Zig and Idris2 unavailable).
+* Shell syntax and `git diff --check`: pass.
+
+Not verified or still needing work:
+
+* Just, Zig, Idris2, REUSE, ShellCheck, Trivy, Gitleaks, and panic-attack were not
+  available in this audit environment. Do not claim their checks passed.
+* Full RSR schema/semantic validation, proof obligations, runtime isolation,
+  crash recovery, realistic fuzzing and benchmarks remain release gates.
+* `static-analysis-gate.yml` still downloads an unverified latest scanner and
+  can produce empty findings for unavailable scans. Its output contract and
+  missing-scan semantics need a separately tested integration repair; a green
+  scan job is not proof that the scanner ran. Review other remote tool downloads
+  and mutable action refs using the estate's actions-lock tooling.
+* Hosted branch-protection inspection returned HTTP 403 (integration lacks
+  access). An administrator must verify required checks, reviews, least-privilege
+  workflow permissions, private reporting, and secret-scanning settings.
+* Current upstream template layout differs from this historical checkout.
+  Migration of machine-readable metadata, generated skeleton contracts, and
+  duplicated governance documents requires a versioned migration, not wholesale
+  copying. The current checks establish local structure, not complete upstream
+  parity. Several inherited build/release recipes are still scaffolding.
+
+Issue #2 remains open. No remote settings, issue status, releases, branch
+protection, or licensing records were mutated by this review.
+
+== Follow-up: Tool Installation and Executed Checks
+
+Later in the same review, the owner authorized installing the missing tools.
+Installed outside the repository under `/home/user/toolchains/`:
+
+* Zig 0.15.2 (PyPI `ziglang` distribution; direct ziglang.org download unavailable).
+* Just 1.58.0 (PyPI `rust-just` distribution).
+* ShellCheck 0.11.0 (PyPI `shellcheck-py` distribution).
+* REUSE 6.2.0 with charset-normalizer support.
+* LMDB 0.9.33, built from upstream tag `LMDB_0.9.33`, commit
+  `3a29a24777c82a0165de813ae696a5068b5add30`; headers and libraries at
+  `/home/user/toolchains/lmdb-install/`. A compiled C linkage smoke test passed.
+
+This supersedes the earlier tool-unavailability statement for those tools only:
+
+* `zig test src/signal/classifier.zig`: 2 tests pass.
+* `zig test src/signal/sampler.zig`: 5 tests pass (includes the same 2 classifier
+  tests; 5 distinct test blocks overall, not 7).
+* `just validate`: passes, with warnings for the broad placeholder heuristic
+  and unavailable Idris2. The FFI `zig build` target is scaffolding and its
+  success is not evidence of a working FFI implementation.
+* ShellCheck on the changed validation/state scripts and `tests/workflows/*.sh`:
+  passes.
+* Compliance regression tests: pass.
+* `reuse lint`: fails compliance. Copyright information found for 298/313 files;
+  license information for 306/313; zero invalid SPDX expressions or missing
+  license texts. No licensing metadata was rewritten to silence these findings.
+
+Idris2 and the security scanners remain unavailable. No crash-durability or
+live memory-pressure test was performed. Installation artefacts are outside
+Git; these are sandbox tools, not new runtime dependencies of llm-grace.
+
+== Follow-up: Issue #4 Implementation Progress
+
+The LMDB decision was retained after considering a switch. ADR-0006 records the
+reasoning, a pinned source review of the owner's type-theory repositories,
+concrete proof targets, and the remaining closure criteria.
+
+`just test` now executes real core tests rather than printing a placeholder
+success message. With Zig 0.15.2 and LMDB 0.9.33, all 19 tests pass in both Debug
+and ReleaseSafe: 10 signal/classifier, 2 finite-ladder, 2 file-bypass, and 5 ledger
+tests. Ledger tests cover abort, reopen, SIGKILL before/after commit, map-full,
+and independent concurrent writers. An external timeout bounds each test suite.
+The existing Estate Rules workflow now runs core tests in both build modes;
+hosted execution has not yet been observed.
+
+`just validate`, the compliance regression suite, ShellCheck on reviewed scripts,
+Zig formatting, and `git diff --check` pass. The root allowlist now explicitly
+permits the ignored `.zig-cache/` produced by those real tests.
+`just e2e` explicitly fails until the live monitor/hook acceptance suite exists;
+it no longer claims success without running anything.
+
+REUSE remains noncompliant: 304/319 files have copyright information and 312/319
+have license information at this checkpoint, with zero invalid SPDX expressions
+or missing license texts. Existing SPDX/copyright lines and `LICENSE`, `LICENSES/`,
+`REUSE.toml` are unchanged. This is still an owner review, not an agent fix queue.
+
+The live monitor, per-session collection/autoconnection, bounded IPC, retention,
+and isolated resource-pressure acceptance tests remain incomplete. No issue was
+closed, and no global hooks or active load-shedding were installed.

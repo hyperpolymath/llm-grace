@@ -10,56 +10,15 @@
 
 # Validate RSR compliance
 validate-rsr:
-    #!/usr/bin/env bash
-    echo "=== RSR Compliance Check ==="
-    MISSING=""
-    for f in .editorconfig .gitignore Justfile README.adoc LICENSE; do
-        [ -f "$f" ] || MISSING="$MISSING $f"
-    done
-    for f in .machine_readable/STATE.a2ml .machine_readable/META.a2ml .machine_readable/ECOSYSTEM.a2ml .machine_readable/anchors/ANCHOR.a2ml .machine_readable/policies/MAINTENANCE-AXES.a2ml .machine_readable/policies/MAINTENANCE-CHECKLIST.a2ml .machine_readable/policies/SOFTWARE-DEVELOPMENT-APPROACH.a2ml; do
-        [ -f "$f" ] || MISSING="$MISSING $f"
-    done
-    for f in licensing/exhibits/EXHIBIT-A-ETHICAL-USE.txt licensing/exhibits/EXHIBIT-B-QUANTUM-SAFE.txt licensing/texts/MPL-2.0.txt; do
-        [ -f "$f" ] || MISSING="$MISSING $f"
-    done
-    if [ ! -d "src/interface/Abi" ] && [ ! -d "src/interface/abi" ]; then
-        MISSING="$MISSING src/interface/Abi"
-    fi
-    for f in src/interface/ffi src/interface/generated; do
-        [ -d "$f" ] || MISSING="$MISSING $f"
-    done
-    for f in docs/governance/MAINTENANCE-CHECKLIST.adoc docs/governance/SOFTWARE-DEVELOPMENT-APPROACH.adoc; do
-        [ -f "$f" ] || MISSING="$MISSING $f"
-    done
-    if [ -f ".machine_readable/META.a2ml" ]; then
-        grep -q 'axis-1 = "must > intend > like"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:axis-1"
-        grep -q 'axis-2 = "corrective > adaptive > perfective"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:axis-2"
-        grep -q 'axis-3 = "systems > compliance > effects"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:axis-3"
-        grep -q 'scoping-first = true' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:scoping-first"
-        grep -q 'idris-unsound-scan = "believe_me/assert_total"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:idris-unsound-scan"
-        grep -q 'audit-focus = "systems in place, documentation explains actual state, safety/security accounted for, observed effects reviewed"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:audit-focus"
-        grep -q 'compliance-focus = "seams/compromises/exception register, bounded exceptions, anti-drift checks"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:compliance-focus"
-        grep -q 'effects-evidence = "benchmark execution/results and maintainer status dialogue/review"' .machine_readable/META.a2ml || MISSING="$MISSING META.a2ml:effects-evidence"
-        grep -q 'compliance-tooling = "panic-attack"' .machine_readable/policies/MAINTENANCE-AXES.a2ml || MISSING="$MISSING MAINTENANCE-AXES.a2ml:compliance-tooling"
-        grep -q 'effects-tooling = "ecological checking with sustainabot guidance"' .machine_readable/policies/MAINTENANCE-AXES.a2ml || MISSING="$MISSING MAINTENANCE-AXES.a2ml:effects-tooling"
-        grep -q 'source-human = "docs/governance/MAINTENANCE-CHECKLIST.adoc"' .machine_readable/policies/MAINTENANCE-CHECKLIST.a2ml || MISSING="$MISSING MAINTENANCE-CHECKLIST.a2ml:source-human"
-        grep -q 'source-human = "docs/governance/SOFTWARE-DEVELOPMENT-APPROACH.adoc"' .machine_readable/policies/SOFTWARE-DEVELOPMENT-APPROACH.a2ml || MISSING="$MISSING SOFTWARE-DEVELOPMENT-APPROACH.a2ml:source-human"
-    fi
-    if [ -n "$MISSING" ]; then
-        echo "MISSING:$MISSING"
-        exit 1
-    fi
-    echo "RSR compliance: PASS"
+    bash scripts/validate-template.sh .
+    bash scripts/check-root-shape.sh .
+    bash scripts/check-no-md-in-docs.sh .
+    bash tests/workflows/validate_workflows_test.sh
 
-# Validate STATE.a2ml syntax
+# Structural check for the repository's S-expression STATE format, not TOML.
+# This is a required-field check, not a full A2ML parser or readiness proof.
 validate-state:
-    @if [ -f ".machine_readable/STATE.a2ml" ]; then \
-        grep -q '^\[metadata\]' .machine_readable/STATE.a2ml && \
-        grep -q 'project\s*=' .machine_readable/STATE.a2ml && \
-        echo "STATE.a2ml: valid" || echo "STATE.a2ml: INVALID (missing required sections)"; \
-    else \
-        echo "No .machine_readable/STATE.a2ml found"; \
-    fi
+    bash scripts/check-state.sh .machine_readable/STATE.a2ml
 
 # Validate AI installation guide completeness (finishbot pre-release check)
 validate-ai-install:

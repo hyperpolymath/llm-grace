@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= llm-grace: AI-Assisted Development Setup
+
+[[ai-implementation]]
+== Current Implementation Boundary
+
+This is a development checkout, not an installable production service.
+The sampler and crash-safe ledger work is tracked in GitHub issue #4.
+Do not install a global daemon, wire production hooks, or promise recovery of
+user work based on this scaffolding.
+
+== Obtain and Inspect the Source
+
+[source,shell]
+----
+git clone https://github.com/hyperpolymath/llm-grace.git
+cd llm-grace
+bash scripts/check-root-shape.sh .
+bash scripts/check-state.sh
+bash tests/workflows/compliance_regression_test.sh
+----
+
+Read `README.adoc`, `AUDIT.adoc`, `READINESS.adoc`, `SECURITY.adoc`, and
+`docs/decisions/0003-graceful-degradation-architecture.adoc` before making changes.
+With Just installed, `just validate` runs the local structural/documentation
+gates. Zig and Idris2 are needed for compiler checks; skipped checks do not
+constitute build evidence. `just security` additionally requires Trivy and
+Gitleaks. Consult `.tool-versions` and the component build documentation before
+selecting compiler versions. Do not pipe remote installation scripts into a shell
+without reviewing and verifying their provenance.
+
+== Privacy and Isolation
+
+Never send credentials, private prompts, ledger records, or full process
+environments to an assistant. Review commands before execution. Keep experimental
+memory pressure and process signalling inside a disposable, resource-limited
+session; no privileged or global deployment is authorized by this guide.
+
+== Licensing Boundary
+
+Issue #2 reserves existing license/SPDX changes to manual owner review.
+Agents must not relicense files, expand blanket licensing globs, or rewrite
+third-party headers as part of setup. Report conflicts instead.

@@ -8,3 +8,6 @@
 # zig 0.14.0
 # idris2 0.7.0
 rust nightly
+
+# Core sampler/ledger test toolchain (do not use a floating Zig version).
+zig 0.15.2
