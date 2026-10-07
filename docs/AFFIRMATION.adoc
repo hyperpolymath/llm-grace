@@ -6,8 +6,17 @@ Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :toclevels: 2
 :icons: font
 :std-docs: https://github.com/hyperpolymath/standards/blob/main/docs
+:status: DRAFT — agent-authored, NOT affirmed by the owner
 
 _This file states what was true and checkable at one commit, and how it was checked._
+
+[IMPORTANT]
+.Status: DRAFT. Not affirmed by the owner
+====
+An agent wrote and committed this file. The owner has not yet affirmed it. Until the owner
+re-anchors it and lands it with a signed `git commit -S`, treat every claim below as an
+agent report, not as the owner's affirmation.
+====
 
 [NOTE]
 ====
