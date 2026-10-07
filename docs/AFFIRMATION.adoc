@@ -1,0 +1,233 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= AFFIRMATION: llm-grace, as of 2026-10-07
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: macro
+:toclevels: 2
+:icons: font
+:std-docs: https://github.com/hyperpolymath/standards/blob/main/docs
+
+_This file states what was true and checkable at one commit, and how it was checked._
+
+[NOTE]
+====
+An affirmation is a dated declaration of what we believe is true. This one is
+profile A (evidential) of the
+link:{std-docs}/AFFIRMATION-STANDARD.adoc[AFFIRMATION standard]. It belongs
+with `README.adoc` and `EXPLAINME.adoc`:
+
+[cols="1,3,2",options="header"]
+|===
+| File | Answers | Tense
+| `README.adoc` | Where is this going, and why? | future
+| `EXPLAINME.adoc` | How is it built, and what is the evidence? | descriptive
+| `docs/AFFIRMATION.adoc` (this file) | What was true and checkable at one commit? | a frozen instant
+|===
+
+This file is optional. Delete it rather than keep it unverified, because a
+stale affirmation is worse than none.
+====
+
+toc::[]
+
+== What this is, and how it works
+
+*What it is.* A dated, signed record of what can be claimed about
+*llm-grace* at one exact commit. It makes no promises about the future; the
+README covers that.
+
+*What the project is.* Graceful degradation for concurrent LLM and agent
+terminals. When system resources run short, sessions back off voluntarily and
+in priority order, before the OS out-of-memory killer takes the whole VM down.
+
+*How it stays trustworthy.* Every claim below comes from running the
+repository's own `just` recipes in the session that wrote this file. The anchor
+names the exact commit. A signed git commit lands the file.
+
+== The epistemic contract
+
+This file records our best belief at the timestamp below. It does not guarantee
+correctness. It does guarantee no intentional overclaim: a test that could not
+run here is listed as not run, not as passed.
+
+You may conclude that:
+
+* every claim below was produced by running the tool at the anchor commit, not
+  copied from memory or from a status document.
+
+You may *not* conclude that:
+
+* anything is true at a later commit;
+* anything this file does not list passes. Silence is not a claim.
+
+Anyone may challenge any claim here with a counter-example or a failing run.
+
+[#verifiable-anchor]
+== Verifiable anchor
+
+[cols="1,2", options="header"]
+|===
+| Field | Contents
+
+| Repo
+| `hyperpolymath/llm-grace`
+
+| Branch
+| `main`
+
+| Commit (HEAD)
+| `d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea`
+
+| Permalink
+| https://github.com/hyperpolymath/llm-grace/tree/d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea
+
+| Verified (UTC)
+| `2026-10-07T10:25:44Z`
+
+| Working-tree delta at verification
+| `clean`. A detached worktree at `origin/main`; `git status --short` was empty.
+
+| Toolchain
+| Zig 0.15.2, just 1.56.0, GNU bash 5.2.37, on Debian 13 (WSL2, Linux
+  6.18.33.2). LMDB development library *not installed* (see <<outstanding>>).
+|===
+
+[WARNING]
+====
+If you are reading this at a later commit, these claims may no longer hold.
+Re-run the steps in <<reproduce>> and write a new affirmation. Do not rely on a
+stale one.
+====
+
+== Companion documents and repo metadata
+
+[cols="1,3", options="header"]
+|===
+| Item | State at the anchor
+
+| `README.adoc`
+| Present. Its opening paragraph matches the GitHub description.
+
+| `EXPLAINME.adoc`
+| Present.
+
+| GitHub description
+| "Graceful degradation for concurrent LLM/agent terminals…", checked against
+  the README on 2026-10-07.
+
+| GitHub topics
+| 13 topics, present.
+|===
+
+== The honest state
+
+=== What is solid, and how we checked
+
+[cols="2,1,3", options="header"]
+|===
+| Claim | Result | Command
+
+| Signal-layer unit tests pass (sampler, classifier)
+| 10/10
+| `just test-smoke`
+
+| Core tests up to the ledger pass: sampler/classifier 10, monitor 10, ladder
+  2, safety 2
+| 24/24 run, 24 passed
+| `just test` (stops at the LMDB link step, see <<outstanding>>)
+
+| Structural checks: fail-closed entrypoints, read-only session start, root
+  allowlist (45 entries, 54 permitted), STATE required fields
+| rc=0
+| `just check`
+
+| Workflow validation, STATE fields, compliance regression tests
+| rc=0
+| `just lint`
+
+| Zig formatting of `src/signal`, `src/control`, `src/ledger`,
+  `src/monitor`
+| rc=0
+| `just fmt-check`
+
+| Cross-cutting aspect tests
+| PASS=2, FAIL=0, WARN=2
+| `just aspect`
+|===
+
+=== The nuance you must not lose
+
+* `just check` says "This is not a release or security certification", and so
+  does this file. It covers the structural checks only.
+* `just e2e` exits 1 *by design*: the live monitor and hook acceptance suite
+  is not implemented (issue #4). The recipe refuses to report a fake success.
+* There is no app or daemon binary to install yet (`just run` says so).
+
+=== Known gaps, stated in the repo
+
+* The end-to-end suite (issue #4) and benchmarks are not implemented.
+
+[#outstanding]
+=== Outstanding, weak or refuted
+
+* *Ledger tests not run here.* `just test` stops with "unable to find dynamic
+  system library 'lmdb'" after the 24 tests above. The ledger tests need the
+  LMDB headers and library (`LMDB_PREFIX`), which this machine did not have.
+  Their result is *unknown*, not passed.
+* *Aspect warnings.* `src/interface/ffi/src/main.zig` lacks an SPDX header.
+  The aspect suite flags this as an owner-only licensing review.
+* *Red CI at the anchor.* Of 37 check runs on this commit, 25 succeeded, 3 were
+  skipped and 9 failed:
+  `governance / Actions lockfile verify`,
+  `governance / Check Workflow Staleness`,
+  `governance / Workflow security linter`, `Hypatia neurosymbolic scan`,
+  `openssf-compliance`, `skeleton-drift`, `SonarCloud Code Analysis`,
+  `Validate DEED manifests`, `Validate K9 contracts`. None is a required
+  check. Issue #96 tracks the pre-existing failures.
+
+[#reproduce]
+== Reproduce it yourself
+
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/llm-grace
+cd llm-grace
+git checkout d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea
+just test-smoke   # expect: All 10 tests passed.
+just check        # expect: Implemented local checks passed.
+just lint
+just fmt-check
+just aspect       # expect: PASS=2 FAIL=0 WARN=2
+just test         # needs LMDB; without it, stops after 24 passing tests
+----
+
+== One-line characterisation
+
+At `d9b4c87`, llm-grace's signal, monitor, ladder and safety layers pass 24
+Zig tests and every implemented structural check. The ledger tests were not run
+here for lack of LMDB, the end-to-end suite does not exist yet, and nine
+non-required CI checks are red.
+
+== Joint attestation
+
+We assert that, to the best of our joint belief at the timestamp above, every
+claim in this file is true and was checked as described. The open gaps are
+stated, not hidden.
+
+* *Engineering party (AI):* Claude Opus 5.5 (`claude-opus-5-5`) ran the checks
+  recorded here at `2026-10-07T10:25:44Z`. It stands behind the wording above as
+  a faithful report of those runs.
+* *Owner / maintainer:* Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk> signs
+  by committing this file with `-S`. The git commit signature over this
+  content, at the commit SHA recorded above, is the cryptographic form of this
+  affirmation.
+
+[source,bash]
+----
+git commit -S -s docs/AFFIRMATION.adoc -m "docs: affirm state at d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea"
+git log --show-signature -1
+----
+
+The file is landed by a signed git commit. Check with `git log --show-signature`
+that the anchor SHA above matches the parent of the commit that introduced this
+affirmation. If they do not match, read this file as a draft.
