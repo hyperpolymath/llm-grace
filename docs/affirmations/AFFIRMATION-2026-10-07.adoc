@@ -1,14 +1,22 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= AFFIRMATION: llm-grace, as of 2026-10-08
+= AFFIRMATION: llm-grace, as of 2026-10-07
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :toc: macro
 :toclevels: 2
 :icons: font
 :std-docs: https://github.com/hyperpolymath/standards/blob/main/docs
+:status: DRAFT — agent-authored, NOT affirmed by the owner
 
-_This file states what was true and checkable at one commit, and how it was
-checked._
+_This file states what was true and checkable at one commit, and how it was checked._
+
+[IMPORTANT]
+.Status: DRAFT. Not affirmed by the owner
+====
+An agent wrote and committed this file. The owner has not yet affirmed it. Until the owner
+re-anchors it and lands it with a signed `git commit -S`, treat every claim below as an
+agent report, not as the owner's affirmation.
+====
 
 [NOTE]
 ====
@@ -22,14 +30,11 @@ with `README.adoc` and `EXPLAINME.adoc`:
 | File | Answers | Tense
 | `README.adoc` | Where is this going, and why? | future
 | `EXPLAINME.adoc` | How is it built, and what is the evidence? | descriptive
-| `docs/AFFIRMATION.adoc` (this file) | What was true and checkable at one
-  commit? | a frozen instant
+| `docs/AFFIRMATION.adoc` (this file) | What was true and checkable at one commit? | a frozen instant
 |===
 
 This file is optional. Delete it rather than keep it unverified, because a
-stale affirmation is worse than none. The previous version, an agent-authored
-draft that the owner never affirmed, is kept at
-`docs/affirmations/AFFIRMATION-2026-10-07.adoc`.
+stale affirmation is worse than none.
 ====
 
 toc::[]
@@ -57,7 +62,7 @@ run here is listed as not run, not as passed.
 You may conclude that:
 
 * every claim below was produced by running the tool at the anchor commit, not
-  copied from memory, from a status document or from the previous affirmation.
+  copied from memory or from a status document.
 
 You may *not* conclude that:
 
@@ -80,24 +85,20 @@ Anyone may challenge any claim here with a counter-example or a failing run.
 | `main`
 
 | Commit (HEAD)
-| `ef97470347fc2db4854d5c4edfbafdfdebd353fd`
+| `d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea`
 
 | Permalink
-| https://github.com/hyperpolymath/llm-grace/tree/ef97470347fc2db4854d5c4edfbafdfdebd353fd
+| https://github.com/hyperpolymath/llm-grace/tree/d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea
 
 | Verified (UTC)
-| `2026-10-08T17:47:36Z` to `2026-10-08T17:47:49Z`
+| `2026-10-07T10:25:44Z`
 
 | Working-tree delta at verification
-| `clean`. A fresh worktree at `origin/main`. `git status --short` was empty
-  before and after the runs; build caches are ignored.
+| `clean`. A detached worktree at `origin/main`; `git status --short` was empty.
 
 | Toolchain
-| Zig 0.15.2 (the version `.tool-versions` pins; the recipes ran under
-  `mise exec`, because the machine's default `zig` is 0.16.0), just 1.56.0,
-  GNU bash 5.2.37, on Debian 13 (WSL2, Linux 6.18.33.2). LMDB development
-  files *not installed*: only the runtime `liblmdb.so.0` is present (see
-  <<outstanding>>).
+| Zig 0.15.2, just 1.56.0, GNU bash 5.2.37, on Debian 13 (WSL2, Linux
+  6.18.33.2). LMDB development library *not installed* (see <<outstanding>>).
 |===
 
 [WARNING]
@@ -120,11 +121,11 @@ stale one.
 | Present.
 
 | GitHub description
-| "Graceful degradation for concurrent LLM/agent terminals…", read live on
-  2026-10-08 and checked against the README.
+| "Graceful degradation for concurrent LLM/agent terminals…", checked against
+  the README on 2026-10-07.
 
 | GitHub topics
-| 13 topics, read live on 2026-10-08.
+| 13 topics, present.
 |===
 
 == The honest state
@@ -161,22 +162,15 @@ stale one.
 | Cross-cutting aspect tests
 | PASS=2, FAIL=0, WARN=2
 | `just aspect`
-
-| The only required check on `main`, `scan / gitleaks`, passed on the anchor
-| success
-| check runs on the anchor commit
 |===
 
 === The nuance you must not lose
 
 * `just check` says "This is not a release or security certification", and so
   does this file. It covers the structural checks only.
-* `just e2e` exits 1 *by design*. It prints "live monitor/hook acceptance
-  suite is not implemented (issue #4)" and refuses to report a fake success.
-* `just run` exits 1 *by design*: there is no application or managed service
-  to launch yet.
-* The only change between the previous anchor (`d9b4c87`) and this one is
-  `docs/AFFIRMATION.adoc` itself. The code measured here is the same code.
+* `just e2e` exits 1 *by design*: the live monitor and hook acceptance suite
+  is not implemented (issue #4). The recipe refuses to report a fake success.
+* There is no app or daemon binary to install yet (`just run` says so).
 
 === Known gaps, stated in the repo
 
@@ -190,15 +184,15 @@ stale one.
   LMDB headers and library (`LMDB_PREFIX`), which this machine did not have.
   Their result is *unknown*, not passed.
 * *Aspect warnings.* `src/interface/ffi/src/main.zig` lacks an SPDX header.
-  The aspect suite flags this as an owner-only licensing review (issue #2).
-* *Red CI at the anchor.* Of 36 check runs on this commit, 24 succeeded, 3 were
+  The aspect suite flags this as an owner-only licensing review.
+* *Red CI at the anchor.* Of 37 check runs on this commit, 25 succeeded, 3 were
   skipped and 9 failed:
   `governance / Actions lockfile verify`,
   `governance / Check Workflow Staleness`,
   `governance / Workflow security linter`, `Hypatia neurosymbolic scan`,
   `openssf-compliance`, `skeleton-drift`, `SonarCloud Code Analysis`,
   `Validate DEED manifests`, `Validate K9 contracts`. None is a required
-  check. Issue #96 (open) tracks these pre-existing failures.
+  check. Issue #96 tracks the pre-existing failures.
 
 [#reproduce]
 == Reproduce it yourself
@@ -207,19 +201,18 @@ stale one.
 ----
 git clone https://github.com/hyperpolymath/llm-grace
 cd llm-grace
-git checkout ef97470347fc2db4854d5c4edfbafdfdebd353fd
-# Use the Zig version that .tool-versions pins (0.15.2), e.g. via mise:
-mise exec -- just test-smoke   # expect: All 10 tests passed.
-mise exec -- just check        # expect: Implemented local checks passed.
-mise exec -- just lint
-mise exec -- just fmt-check
-mise exec -- just aspect       # expect: PASS=2 FAIL=0 WARN=2
-mise exec -- just test         # needs LMDB; without it, stops after 24 tests
+git checkout d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea
+just test-smoke   # expect: All 10 tests passed.
+just check        # expect: Implemented local checks passed.
+just lint
+just fmt-check
+just aspect       # expect: PASS=2 FAIL=0 WARN=2
+just test         # needs LMDB; without it, stops after 24 passing tests
 ----
 
 == One-line characterisation
 
-At `ef97470`, llm-grace's signal, monitor, ladder and safety layers pass 24
+At `d9b4c87`, llm-grace's signal, monitor, ladder and safety layers pass 24
 Zig tests and every implemented structural check. The ledger tests were not run
 here for lack of LMDB, the end-to-end suite does not exist yet, and nine
 non-required CI checks are red.
@@ -231,8 +224,8 @@ claim in this file is true and was checked as described. The open gaps are
 stated, not hidden.
 
 * *Engineering party (AI):* Claude Opus 5.5 (`claude-opus-5-5`) ran the checks
-  recorded here between `2026-10-08T17:47:36Z` and `2026-10-08T17:47:49Z`. It
-  stands behind the wording above as a faithful report of those runs.
+  recorded here at `2026-10-07T10:25:44Z`. It stands behind the wording above as
+  a faithful report of those runs.
 * *Owner / maintainer:* Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk> signs
   by committing this file with `-S`. The git commit signature over this
   content, at the commit SHA recorded above, is the cryptographic form of this
@@ -240,9 +233,7 @@ stated, not hidden.
 
 [source,bash]
 ----
-git commit -S -s docs/AFFIRMATION.adoc \
-  docs/affirmations/AFFIRMATION-2026-10-07.adoc \
-  -m "docs: affirm state at ef97470347fc2db4854d5c4edfbafdfdebd353fd"
+git commit -S -s docs/AFFIRMATION.adoc -m "docs: affirm state at d9b4c8799d1e721489c9cc35e9c0f7ec3f8150ea"
 git log --show-signature -1
 ----
 
