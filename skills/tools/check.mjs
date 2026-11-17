@@ -13,7 +13,8 @@ import { DEFAULT_ROOT, build, loadSkill, manifestText, parseArgs, skillDirs } fr
 const FAMILY_KINDS = { seam: ["modes", "mandate", "lenses-intro", "lens", "workflows", "outputs", "interaction"] };
 const SKIP_SOURCE_LINES = new Set(["Instructions", "See less"]);
 const ALLOWED_KEYS = new Set(["name", "description", "license", "compatibility", "metadata", "allowed-tools"]);
-const AGENTSKILLS = "/tmp/claude-0/-home-user/fd60e6b2-2faa-55c1-b210-3432d830dba2/scratchpad/tools/venv/bin/agentskills";
+// Optional third-party cross-check: set AGENTSKILLS_BIN to the `agentskills` executable to enable it.
+const AGENTSKILLS = process.env.AGENTSKILLS_BIN || "";
 
 // Python-compatible whitespace, so norm() and splitlines() behave as the old checker did.
 const WS = "\\t\\n\\v\\f\\r \\x1c-\\x1f\\x85\\xa0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000";
@@ -30,7 +31,7 @@ function walk(dir, rel = "") {
     if (e.isDirectory()) out.push(...walk(dir, r));
     else out.push(r);
   }
-  return out.sort();
+  return out.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
 function treeDiff(fresh, actual) {
@@ -178,7 +179,7 @@ function checkSkill(root, dirName) {
   const required = FAMILY_KINDS[data.family];
   if (!required) problems.push(`unknown family '${data.family}'`);
   else {
-    const missing = required.filter((k) => !kinds.has(k)).sort();
+    const missing = required.filter((k) => !kinds.has(k)).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
     if (missing.length) problems.push(`family '${data.family}' requires sections: ${JSON.stringify(missing)}`);
   }
   if (!data.description.toLowerCase().includes("use when")) problems.push("description has no 'Use when' trigger");

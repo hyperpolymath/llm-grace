@@ -417,7 +417,7 @@ function main() {
     if (!bySkill.has(v.name)) bySkill.set(v.name, []);
     bySkill.get(v.name).push(v);
   }
-  const skillNames = [...bySkill.keys()].sort();
+  const skillNames = [...bySkill.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
   for (const n of skillNames) {
     const list = bySkill.get(n);
     list.sort((x, y) => y.words - x.words || (x.sha < y.sha ? -1 : 1));

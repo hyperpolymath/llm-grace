@@ -27,7 +27,7 @@ export function canonicalize(v) {
   if (Array.isArray(v)) return "[" + v.map(canonicalize).join(",") + "]";
   if (typeof v === "object") {
     // default sort compares UTF-16 code units, as JCS requires
-    return "{" + Object.keys(v).sort().map((k) => canonicalize(k) + ":" + canonicalize(v[k])).join(",") + "}";
+    return "{" + Object.keys(v).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)).map((k) => canonicalize(k) + ":" + canonicalize(v[k])).join(",") + "}";
   }
   throw new Error("not JSON: " + typeof v);
 }
@@ -113,7 +113,7 @@ export function skillDirs(root) {
   if (!fs.existsSync(base)) return [];
   return fs.readdirSync(base, { withFileTypes: true })
     .filter((e) => e.isDirectory() && fs.existsSync(path.join(base, e.name, "manifest.json")))
-    .map((e) => e.name).sort();
+    .map((e) => e.name).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
 export function build(root, outroot) {

@@ -5,7 +5,7 @@ Rule: nothing under `originals/` is ever edited. Rebuilt skills go in `skills/`.
 - `originals/raw/` — full texts as pasted by the owner. The owner's chat comment at the start of line 1 has been removed; nothing else is changed.
 - `originals/hermaneut.original.md` — same wording as the raw paste, with headings and tables restored.
 - The zip of regenerated summaries that started this work, and the reviewer notes, are kept privately and are not in this directory.
-- `skills/` — portable Agent Skills (`<name>/SKILL.md` plus reference files), each validated with `agentskills validate`.
+- `skills/` — portable Agent Skills (`<name>/SKILL.md` plus reference files). Format is checked natively by `tools/check.mjs`; set `AGENTSKILLS_BIN` to also cross-check with the third-party `agentskills validate`.
 
 ## Recovery status
 
