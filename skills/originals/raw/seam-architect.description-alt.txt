@@ -1,0 +1,1 @@
+Analyze system boundaries, integrations, contracts, coupling, resilience, ownership, security, data integrity, evolution, and cost. Use when mapping integration points, auditing architecture seams, tracing requests across boundaries, planning failure experiments or migrations, designing integrations, or comparing architectural options.

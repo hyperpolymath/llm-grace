@@ -1,0 +1,192 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Proof profiles chosen by need — draft proposal
+:toc: preamble
+
+Status: *unratified draft*, written in an agent session on 2026-11-17 at the
+owner's request. It is not policy, it assigns no grade, and it changes no
+gate. It is intended for `metadatastician/standards`; it has not been sent
+there.
+
+The controlling policy is `3-practice/PROOF-POLICY.adoc` (read at standards
+commit `b49a33e`). Where this draft and that file disagree, that file governs.
+
+== 1. The gap
+
+Two independent searches (a session of 2026-11-04 and this one) found no
+adopted document that says which Agda foundation, flags and libraries a piece
+of mathematics should use. What exists:
+
+[cols="2,3",options="header"]
+|===
+|Question |Where the answer is today
+
+|Which prover carries which obligation?
+|`PROOF-POLICY` §1
+
+|How is an Agda theory proof invoked?
+|`PROOF-POLICY` §2.1: `agda --safe --without-K --cubical-compatible`
+
+|How strong is the witness?
+|`PROOF-POLICY` §8, Proof Witness Grades; data mirror `proof-witness-grades.k9.ncl`
+
+|What may a proof assume?
+|`docs/TRUSTED-BASE-REDUCTION-POLICY.adoc`
+
+|Which theorems, by subject, must a toolchain express?
+|`4-readiness/toolchain-readiness-grades/templates/CANONICAL-PROOF-SUITE.adoc` (v1.1, proposed)
+
+|What must each repository prove?
+|`docs/proofs/REQUIREMENTS-MASTER.adoc` and its spec templates
+
+|When may full Cubical Agda be used, and what does it earn?
+|*Nowhere.* §2.1 requires "an explicit, separately reviewed proof profile". None is written.
+|===
+
+That table is also the proposed routing page (§5).
+
+== 2. The proposal in four moves
+
+=== Move 1 — Choose the profile by what the proof needs, not by its field
+
+A field does not fix a foundation. Quandle axioms and colourings are plain
+algebra; a knot complement as a homotopy type is not. The selector is the
+construction the proof needs:
+
+[cols="3,2,3",options="header"]
+|===
+|The proof needs |Profile |Rule
+
+|Univalence, higher inductive types, or computing with paths
+|`agda-cubical`
+|Only the part that needs it goes in the cubical layer.
+
+|Function extensionality as a theorem
+|`agda-cubical`
+|Or stay in the core and carry extensionality as an explicit hypothesis.
+
+|Axiom K, or uniqueness of identity proofs
+|none
+|Not admissible. Restate over a type with decidable equality, or carry an
+explicit set-level hypothesis.
+
+|A classical axiom
+|`agda-canonical`
+|`PROVEN-WITH-AXIOMS`, under disposition (c) of the trusted-base policy.
+
+|None of these
+|`agda-canonical`
+|The default.
+|===
+
+Fields become a lookup of examples that points into this table. The Canonical
+Proof Suite's subject list can serve as that lookup once its entries are
+tagged with the profile each needs. That tagging is not done here.
+
+=== Move 2 — Core first, cubical on top
+
+Prove as much as possible under the canonical profile. A cubical module may
+import a canonical one; the reverse is not possible. So the canonical core is
+usable in both worlds, and the cubical layer holds only what genuinely needs
+it.
+
+=== Move 3 — Witness legs attach to the core
+
+The Rocq and Lean legs of `PROOF-POLICY` §2 attach to statements of the
+canonical core, which climb the grades as usual. A statement that exists only
+in the cubical layer stays at `PWG-3` under the reviewed profile, and its
+record says so. This is the owner's ruling of 2026-11-17 in this session; it
+needs recording in the policy to take effect.
+
+Reason: Lean has definitional proof irrelevance, from which uniqueness of
+identity proofs follows, and that conflicts with univalence. A cubical
+statement that uses univalence therefore has no direct Lean counterpart.
+Sources are in §8. Whether a Rocq leg with univalence as a named axiom should
+count is left open (§7).
+
+=== Move 4 — Profiles as data
+
+`proof-profiles.k9.ncl`, beside this file, holds the profiles, the selection
+table and the rules, in the shape of `proof-witness-grades.k9.ncl`. Gates,
+documents and agent skills would read that one file. It also gives stricter
+repository configurations a name without making them canon: the
+`--double-check` configuration that the trusted-base policy describes for
+`JuliaPackageSpitter.jl` is recorded there as a variant, "not a rule".
+
+== 3. What was tested
+
+`evidence/run.sh` checks four claims and reads each exit status directly.
+
+[cols="3,1,1",options="header"]
+|===
+|Claim |Expected |Observed
+
+|A module under the canonical flags checks
+|accepted
+|accepted
+
+|A `--safe --cubical` module imports that module and proves function extensionality
+|accepted
+|accepted
+
+|A `--cubical` module importing a module that has only `--without-K`
+|refused
+|refused
+
+|A proof by axiom K under the canonical flags
+|refused
+|refused
+|===
+
+All four gave the same result under two checkers: Agda 2.6.3 from the system
+packages, and Agda 2.7.0.1 from `guix time-machine` at the Guix commit that
+`hyperpolymath/mathesis` pins in `build/channels.scm` (`8edb9da`). Under
+that same pinned shell, Mathesis's own gate (`scripts/check-proofs.sh agda`)
+passed for all ten of its modules.
+
+These are session runs, not receipts: no CI run and no source commit of the
+estate stands behind them.
+
+A related observation from the same session: in a five-arm test of proof
+skills, 14 of 15 Agda files written by agents passed the canonical flags, under
+both checkers. The one failure had passed plain `--safe`; it used axiom K.
+
+== 4. What this does not change
+
+* The canonical invocation of §2.1.
+* The status tokens of §5, the correspondence states of §2.2, and the Proof
+Witness Grades of §8. A profile is a fourth, separate field.
+* The rule that grades are derived from receipts and never asserted.
+
+== 5. Routing page
+
+The table in §1, kept as one short page that every proof document links to.
+Each row names one authoritative document. A document that is not the
+authority for a question carries a pointer, as the Mathesis brief already
+does for grades.
+
+== 6. Places that need reconciling
+
+. *Brief and policy on cubical.* The Mathesis brief places full cubical inside
+its grade 3 for knot and Conway problems. The policy puts it outside §2.1.
+Move 3 resolves this if adopted.
+. *Proof suite and the no-Mathlib rule.* The suite names Mathlib 22 times as a
+place to find proofs to port. §2 forbids the dependency. The suite should say
+that its pointers are sources to port from, not permitted imports.
+. *Requirements Master prover key.* Its key lists Lean, TLA+ and Isabelle per
+repository. Whether each use is a §4 exception has not been checked here.
+. *Paths.* Links recorded before the `4-readiness/` move point at paths that
+no longer exist.
+
+== 7. Open questions for the owner
+
+. Does a Rocq leg that takes univalence as a named axiom count for a
+cubical-only statement, as `PROVEN-WITH-AXIOMS`?
+. Which libraries, at which pins, may the cubical layer import?
+. Who reviews a use of the cubical profile, and where is the review recorded?
+
+== 8. Sources
+
+* Agda documentation, "Cubical compatible": https://agda.readthedocs.io/en/latest/language/cubical-compatible.html
+* Agda 2.6.3 release notes: https://hackage.haskell.org/package/Agda-2.7.0.1/docs/doc/release-notes/2.6.3.md
+* Gilbert, Cockx, Sozeau, Tabareau, "Definitional Proof-Irrelevance without K": https://rocq-prover.org/papers/definitional-proof-irrelevance-without-k
+* Lean community discussion of uniqueness of identity proofs and univalence: https://leanprover-community.github.io/archive/stream/236446-Type-theory/topic/Adding.20UIP-compatible.20univalence.3F.html
