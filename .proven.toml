@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: MPL-2.0
+# Manifest for this repository (schema proven/manifest/v1); see
+# hyperpolymath/proven-cicd-and-workflows docs/PROVEN-ADOPTION.adoc.
+#
+# Real code: Zig (src/signal, src/control, src/ledger, src/monitor) with
+# 0.15.2-pinned tests, and shell tooling under scripts/ and tests/. The Zig FFI
+# template under src/interface/ffi is not a target here (it has no test step).
+# Commands are spelled out rather than `just ...` because the umbrella runner
+# does not provision `just`.
+schema = "proven/manifest/v1"
+
+# ---- languages with no umbrella runner in release 0.1 -----------------------
+[languages.ignore.idris2]
+reason = "Idris2 ABI and proof sources (src/interface/Abi, verification/proofs/idris2); umbrella release 0.1 provisions no Idris2 toolchain. PROOF-STATUS.adoc records 0 of 7 proofs done."
+
+[languages.ignore.agda]
+reason = "verification/proofs/agda/Properties.agda is a proof skeleton; umbrella release 0.1 provisions no Agda toolchain."
+
+[languages.ignore.coq]
+reason = "verification/proofs/coq/TypeSafety.v is a proof skeleton; umbrella release 0.1 provisions no Coq toolchain."
+
+[languages.ignore.lean]
+reason = "verification/proofs/lean4/ApiTypes.lean is a proof skeleton; umbrella release 0.1 provisions no Lean toolchain."
+
+[languages.ignore.tla]
+reason = "verification/proofs/tlaplus/StateMachine.tla is a specification skeleton; umbrella release 0.1 provisions no TLA+ toolchain."
+
+# ---- zig ---------------------------------------------------------------------
+# The core suite (scripts/test-core.sh) needs Zig 0.15.2 (the umbrella default)
+# and the LMDB development library for src/ledger/lmdb.zig.
+[categories.unit.zig]
+command = '''
+set -euo pipefail
+sudo apt-get update -q
+sudo apt-get install -y -q liblmdb-dev
+bash scripts/test-core.sh -O Debug
+'''
+
+# Same smoke target as `just test-smoke`: the pure signal sampler tests.
+[categories.smoke.zig]
+command = "zig test src/signal/sampler.zig"
+
+# There is no root build target by design (scripts/dev.sh build fails on
+# purpose). The one buildable artefact is the read-only monitor.
+[categories.build.zig]
+command = '''
+set -euo pipefail
+mkdir -p zig-out/bin
+zig build-exe --dep monitor --dep sampler -Mroot=src/monitor/main.zig -lc --dep sampler -Mmonitor=src/monitor/monitor.zig -Msampler=src/signal/sampler.zig -femit-bin=zig-out/bin/llm-grace-monitor
+zig-out/bin/llm-grace-monitor --version
+'''
+
+[categories.p2p.zig.waiver]
+reason = "the live monitor/hook acceptance suite is not implemented (`just e2e` exits 1 on purpose, repository issue #4); there is no test of the monitor against a running hook yet"
+until = "2027-01-15"
+
+# ---- shell -------------------------------------------------------------------
+# scripts/dev.sh lint: bash -n over every script, plus the workflow-validation,
+# compliance-regression and dev-entrypoint tests under tests/workflows.
+[categories.unit.shell]
+command = "bash scripts/dev.sh lint"
+
+[categories.smoke.shell]
+na = "shell is development tooling only; the product's smoke check (the signal sampler) is declared under zig"
+
+[categories.build.shell]
+na = "interpreted scripts, nothing to compile; syntax is checked with bash -n inside the shell unit command"
+
+[categories.p2p.shell]
+na = "the scripts are independent tooling with no inter-component seam; the monitor/hook seam is waived under zig"
+
+# No [bench] entry: benches/template_bench.sh swallows step failures (|| true) and
+# runs a zig test step that does not exist, so it would be green by construction.
+# Add one once the script propagates failures.
