@@ -69,10 +69,6 @@ na = "interpreted scripts, nothing to compile; syntax is checked with bash -n in
 [categories.p2p.shell]
 na = "the scripts are independent tooling with no inter-component seam; the monitor/hook seam is waived under zig"
 
-# ---- bench -------------------------------------------------------------------
-# benches/template_bench.sh times repository validation, the zig build, the
-# tests and workflow validation. It exits 0 on a runner-like PATH. Mean-time
-# history on main does not exist yet, hence baselining.
-[bench.template]
-command = "bash benches/template_bench.sh"
-baselining = true
+# No [bench] entry: benches/template_bench.sh swallows step failures (|| true) and
+# runs a zig test step that does not exist, so it would be green by construction.
+# Add one once the script propagates failures.
